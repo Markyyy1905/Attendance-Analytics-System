@@ -1,13 +1,93 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
-@import 'tailwindcss';
-@import '../styles.css';
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap");
+@import "tailwindcss";
+@import "../styles.css";
 
-:root { --cp-ink: #22382f; --cp-muted: #7b8981; --cp-green: #397b68; --cp-line: #e3e9e3; }
-[data-theme='dark'] { color-scheme: dark; }
-button, a, input { outline-color: #78a391; }
-.field-error { display: block; color: #bd554f; font-size: 10px; margin-top: 5px; }
-.metric-icon.blue { color: #607e9a; background: #eaf0f7; }
-.metric-icon.red { color: #cf5b53; background: #f9e8e6; }
-.dashboard-distribution { margin-top: 45px; }
-.distribution-total { display: flex; flex-direction: column; align-items: center; margin-top: 25px; color: #8b9891; font-size: 11px; }
-.distribution-total strong { font: 700 28px Manrope; color: #2f4b3e; }
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+.field-error {
+  display: block;
+  color: #a54943;
+  font-size: 12px;
+  margin-top: 5px;
+}
+.metric-icon.blue {
+  color: #546e86;
+  background: #eaf0f7;
+}
+.metric-icon.red {
+  color: #a54943;
+  background: #f9e8e6;
+}
+.dashboard-distribution {
+  margin-top: 45px;
+}
+.distribution-total {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 25px;
+  color: #66706a;
+  font-size: 13px;
+}
+.distribution-total strong {
+  font: 700 28px Manrope;
+  color: #2f4b3e;
+}
+
+/* Focus: one visible ring for every interactive element */
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+.search-field:focus-within {
+  border-color: #6fa087;
+  box-shadow: 0 0 0 3px #e5f1e9;
+}
+.search-field input:focus-visible {
+  outline: none;
+}
+
+/* Clickable student rows: the name is the real link, the row is a mouse shortcut */
+.student-cell a {
+  color: inherit;
+  text-decoration: none;
+}
+.student-cell a:hover strong {
+  color: var(--green);
+  text-decoration: underline;
+}
+tbody tr.row-link:focus-within {
+  background: #f3f8f5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+.student-cell a {
+  display: block;
+}
+
+/* Avatars are <span>s, so "span" rules in tables and the user card were
+   overriding their grid centering and colours. */
+.student-cell .avatar,
+.user-card .avatar,
+.activity-item .avatar {
+  display: inline-grid;
+  margin-top: 0;
+  max-width: none;
+  overflow: visible;
+  font-size: 12px;
+  color: #795534;
+}
+.user-card .user-avatar {
+  color: #316b5b;
+}
+
+/* Breathing room between a card header and the table under it */
+.section-header + .table-scroll {
+  margin-top: 18px;
+}
