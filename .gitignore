@@ -1,0 +1,48 @@
+﻿# Dependencies
+node_modules/
+
+# Production build output
+dist/
+build/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs and diagnostics
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+report.*.json
+
+# Test and coverage output
+coverage/
+playwright-report/
+test-results/
+
+# Tool caches
+.vite/
+.cache/
+.eslintcache
+.stylelintcache
+
+# Generated Impeccable state and visual review captures
+.impeccable/build/
+.impeccable/review/
+.agent
+.agents
+.claude
+.codex
+.gemini
+.impeccable
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
