@@ -6,15 +6,33 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
+    "@tanstack/react-query": "^5.104.0",
     "@vitejs/plugin-react": "latest",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
     "lucide-react": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "react-hook-form": "^7.89.0",
+    "react-router-dom": "^7.18.4",
     "recharts": "latest",
-    "vite": "latest"
+    "vite": "latest",
+    "zod": "^4.6.5",
+    "zustand": "^5.0.15"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.6.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^10.11.0",
+    "prettier": "^3.9.9",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2"
+  }
 }
