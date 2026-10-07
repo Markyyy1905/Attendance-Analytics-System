@@ -10,7 +10,7 @@
 .search-control input::placeholder { color: var(--muted); }
 .attendance-filter { min-width: 160px; }
 .attendance-filter svg { color: #3fb950; flex: 0 0 auto; }
-.attendance-filter select { color: var(--muted-strong); }
+.attendance-filter .select-field-trigger { color:var(--ink-soft); }
 .mark-legend { display: flex; align-items: center; gap: 13px; margin-left: auto; }
 .mark-legend > span { display: inline-flex; align-items: center; gap: 5px; color: #3fb950; font-size: .7rem; }
 .mark-legend .attendance-mark { width: 21px; height: 20px; font-size: .65rem; }

@@ -2,8 +2,9 @@
 .class-workspace-toolbar { display: flex; align-items: center; gap: 14px; padding: 14px 16px; margin-bottom: 15px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 .class-search { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 180px; color: var(--muted-strong); }
 .class-search input { width: 100%; height: 38px; padding: 0 10px; color: var(--ink); border: 1px solid var(--line); border-radius: 7px; background: var(--surface); font: inherit; }
-.class-term-filter { display: flex; align-items: center; gap: 8px; color: var(--muted-strong); font-size: .75rem; }
-.class-term-filter select { height: 38px; min-width: 150px; padding: 0 10px; color: var(--ink-soft); border: 1px solid var(--line); border-radius: 7px; background: var(--surface); font: inherit; }
+.class-term-filter { min-width:150px; display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:8px; color:var(--muted-strong); font-size:.75rem; }
+.class-term-filter .select-field-label { font:inherit; color:inherit; }
+.class-term-filter .select-field-trigger { min-height:38px; border-color:var(--line); }
 .class-result-count { color: var(--muted-strong); font-size: .75rem; white-space: nowrap; }
 .class-table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 .class-table { width: 100%; border-collapse: collapse; white-space: nowrap; text-align: left; }
@@ -30,7 +31,7 @@
 .class-workspace-note { margin: 12px 2px 0; color: var(--muted); font-size: .7rem; line-height: 1.5; }
 @media (max-width: 760px) {
   .class-workspace-toolbar { align-items: stretch; flex-direction: column; }
-  .class-search, .class-term-filter, .class-term-filter select { width: 100%; }
+  .class-search, .class-term-filter { width: 100%; }
   .class-result-count { align-self: flex-end; }
   .class-table { min-width: 820px; }
 }

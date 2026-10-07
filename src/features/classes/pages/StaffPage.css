@@ -4,7 +4,7 @@
 .staff-access-heading h2 { margin:0; color:var(--ink); font:650 1.08rem "Manrope",sans-serif; letter-spacing:-.018em; }
 .staff-access-heading p { margin:5px 0 0; color:var(--muted); font-size:.84rem; }
 .staff-select-label { width:min(100%,360px); display:grid; gap:6px; color:var(--ink-soft); font-size:.78rem; font-weight:600; }
-.staff-select-label select { width:100%; min-height:44px; padding:0 10px; color:var(--ink); background:var(--surface); border:1px solid var(--line-strong); border-radius:8px; font:inherit; }
+.staff-select-label .select-field-trigger { min-height:44px; }
 .staff-selected-person { display:flex; align-items:center; gap:7px; margin:0 0 13px; color:var(--muted-strong); font-size:.82rem; }
 .staff-selected-person svg { color:var(--brand); }
 .staff-selected-person strong { color:var(--ink); }
