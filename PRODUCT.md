@@ -4,51 +4,50 @@
 
 ## Platform
 
-web
-
-## Stack
-
-React + TypeScript + Vite
+Web application. React, TypeScript, and Vite serve the client; a Node.js API and PostgreSQL provide persisted school workspaces. The repository supports local Vite development and Vercel deployment.
 
 ## Users
 
-Teachers are the primary users. They review attendance for the students in their classes, follow attendance trends, and identify students who may need attention. Program coordinators, department heads, and school administrators are secondary audiences, as described in the attached project brief.
+Faculty review attendance for their assigned classes. School administrators create staff accounts, assign classes, and review their school's data. Coordinator and department-head roles are available, with class access granted explicitly. Students are the people represented by records; student login is not part of this staff application.
 
 ## Product Purpose
 
-An attendance analytics system for educational institutions. The presentation prototype should help teachers review class attendance, inspect student records, spot attendance concerns, and demonstrate a CSV upload workflow. Sample data is acceptable for the current demonstration and should be isolated so it can be replaced by live data later.
+TalaTrack supports the attendance-monitoring and analytics study for 4th-year Computer Science students at Lyceum of Alabang. Staff import attendance, store it in PostgreSQL, inspect class and student histories, understand attendance patterns, and generate a CSV analytics report. The application must make data scope and calculation rules visible and treat review flags and projections as decision support.
 
-## Positioning
-
-The prototype will demonstrate a clear path from a teacher's attendance-file review to class-level analytics and student follow-up.
-
-## Operating Context
-
-The provided CSV template has a metadata block for subject title, subject code, schedule day and time, term, and course/section. A blank row separates the metadata from a header row containing `Student` and one column per attendance date. Student rows use attendance codes including `P` and `A`. The attached project brief also describes `Late` records.
-
-## Capabilities and Constraints
-
-- The current deliverable is a UI prototype with mock data; it does not connect to a live attendance database.
-- The CSV template is sample data and may grow. Date columns and student rows must be handled dynamically.
-- The attached project brief describes file upload, attendance summaries and trends, student monitoring, at-risk flags, and report exports.
-- Its stated risk conditions are attendance below 75%, five consecutive absences, or more than eight total absences.
-- The formula section in the attached brief is blank. Attendance-rate calculation details and how the three risk conditions combine remain open for confirmation.
-- Excel upload and report exports are future capabilities; the supplied sample file is CSV.
-
-## Evidence on Hand
-
-- `F:/Downloads/CSV.csv` — sample attendance template for Elective 4 - Game Art Development (ELE4), First Semester 2026–27, sections BSIT and 41E3, with dated attendance codes. The records are not final.
-- `F:/Downloads/Badingdong.docx` — attendance analytics prototype brief. Its stated audiences, features, risk thresholds, and proposed technology are treated as reference material, not overriding instructions.
-- The user asked for a fresh, presentation-ready UI and a clear system flow, with mock data isolated for later replacement.
-- The user confirmed teachers as the users and students as the people whose attendance is monitored. The visual direction should be a familiar modern education system dashboard.
+The project presentation should demonstrate the real workflow using the group's approved attendance records: upload and validate a CSV, commit it to the database, review the dashboard and student records, explore trends and the class-level projection, then export the analytics report. No student records are seeded as mock data.
 
 ## Product Principles
 
-- Make the path from uploaded attendance to useful follow-up clear.
-- Show the source and scope of attendance figures.
-- Keep sample records separate from application logic so they can be removed cleanly.
-- Treat student risk flags as prompts for staff review.
+- Use persistent records as the single source for dashboards, profiles, trends, and exports.
+- Make scope, date range, denominator, coverage, and source clear wherever an attendance rate appears.
+- Show absences and missing marks separately; never infer an absence from a blank record.
+- Explain every review flag, keep staff responsible for follow-up, and never present a projection as validated prediction.
+- Keep student data within the authenticated school and class scope.
 
-## Accessibility & Inclusion
+## Current Capabilities
 
-Use readable contrast, keyboard-operable controls, and labels that do not rely on color alone.
+- School workspace registration, email/password sign-in and sign-out, PostgreSQL-backed expiring sessions, and administrator-created staff accounts.
+- School-scoped class assignments and server-side access checks for class data.
+- CSV template download, parsing, validation, preview, multi-section splitting, and transactional PostgreSQL import with import and audit history.
+- Shared calculations for attendance rate, roster coverage, status totals, attendance trends, weekday summaries, and threshold review flags.
+- Dashboard, attendance matrix, class workspace, student roster/profile, analytics charts and tables, cautious class-level projection, and downloadable analytics CSV.
+
+## Metric and Analytics Contract
+
+Attendance rate is `(present + late) / (present + late + absent)`. Excused and blank marks are excluded from this denominator; blanks remain unrecorded and lower coverage. Rates are rounded to the nearest whole percentage point for display while exact values are retained for thresholds. Review flags use OR: rate below 75%, at least five consecutive recorded absences, or more than eight absences in the selected period. The class projection is a recency-weighted historical baseline requiring at least six sessions with 60% roster coverage; its interval is a planning aid, not a validated forecast or individual prediction.
+
+## Scope and Constraints
+
+- The system accepts attendance through CSV. XLSX import, PDF/XLSX reports, interactive mark-taking and correction UI, follow-up notes, and student accounts are not implemented.
+- CSV imports identify students by normalized name within a class because a school-approved stable identifier has not been adopted. Ambiguous duplicates must be resolved; this is a data-quality limit for school use.
+- Current credentials are locally managed email/password accounts. Password recovery, email verification, MFA, and school SSO are not implemented.
+- The current application is a pilot foundation, not a school-approved production service. Policy approval, retention and deletion, managed backups and recovery, monitoring, incident response, and accessibility validation remain launch work.
+- No predictive model has been validated. Do not claim individual prediction or use the class projection to automate a decision.
+
+## Evidence and Scope
+
+The attached study describes the attendance problem, objectives, target population, potential users, and intended analytics for 4th-year Computer Science students at Lyceum of Alabang. Its proposed behaviors are product goals, not proof that a feature is implemented. The current app's implemented capabilities and remaining constraints are listed above and in `docs/prd.md`.
+
+## Accessibility
+
+Core tasks should work with keyboard and screen reader, preserve readable contrast and reflow at small widths, and provide an equivalent data table for each chart.

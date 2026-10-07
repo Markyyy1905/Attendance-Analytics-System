@@ -1,6 +1,6 @@
 # Architecture
 
-Attendwise has a React + TypeScript + Vite client, a small Node.js API for local development, and PostgreSQL persistence through `pg`.
+TalaTrack has a React + TypeScript + Vite client, a small Node.js API for local development, and PostgreSQL persistence through `pg`.
 
 ## Data flow
 

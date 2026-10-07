@@ -1,18 +1,21 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, CircleAlert, FileUp } from "lucide-react";
+import { ArrowRight, CircleAlert, Download, FileUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AttendanceTrendChart } from "../../../components/charts/AttendanceTrendChart";
 import { RiskLabel } from "../../../components/ui/AttendanceMark";
 import { EmptyState, PageHeader } from "../../../components/ui/PageHeader";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { getAttendanceForecast, getDateTrend, getDatasetSummary, getStudentMetrics, getWeekdayTrend } from "../../../shared/lib/attendanceMetrics";
+import { analyticsReportFilename, buildAnalyticsCsv } from "../lib/exportAnalyticsCsv";
 import "./AnalyticsPage.css";
 
 export function AnalyticsPage() {
-  const { dataset, isLoading, dataError } = useAttendanceData();
+  const { dataset, isLoading, dataError, activeClassId, recordReport } = useAttendanceData();
   const [sectionFilter, setSectionFilter] = useState("all");
   const [rangeFilter, setRangeFilter] = useState("all");
   const [studentFilter, setStudentFilter] = useState("");
+  const [reportPending, setReportPending] = useState(false);
+  const [reportError, setReportError] = useState("");
   const sections = [...new Set(dataset.students.map((student) => student.section).filter(Boolean))].sort();
   const scopedDataset = useMemo(() => {
     const query = studentFilter.trim().toLocaleLowerCase();
@@ -41,6 +44,60 @@ export function AnalyticsPage() {
   const periodChange = trend.length >= 2 ? (periodRate(trend.slice(midpoint)) ?? 0) - (periodRate(trend.slice(0, midpoint)) ?? 0) : null;
   const maxMark = Math.max(summary.present, summary.absent, summary.late, summary.excused, summary.unrecorded, 1);
 
+  async function downloadReport() {
+    if (!activeClassId || reportPending) return;
+    setReportError("");
+    setReportPending(true);
+    try {
+      const receipt = await recordReport({
+        classId: activeClassId,
+        reportType: "class_analytics",
+        format: "csv",
+        filters: {
+          section: sectionFilter === "all" ? "All sections" : sectionFilter,
+          dateRange: rangeFilter === "all" ? "All dates" : rangeFilter === "recent10" ? "Recent 10 sessions" : "Recent 5 sessions",
+          startDate: scopedDataset.dates[0] || "",
+          endDate: scopedDataset.dates.at(-1) || "",
+          studentSearchApplied: Boolean(studentFilter.trim()),
+          studentCount: scopedDataset.students.length,
+          sessionCount: scopedDataset.dates.length,
+        },
+      });
+      const reportDataset = {
+        ...scopedDataset,
+        metadata: {
+          ...scopedDataset.metadata,
+          section: sectionFilter === "all" ? scopedDataset.sections.join(", ") : sectionFilter,
+        },
+      };
+      const report = buildAnalyticsCsv({
+        dataset: reportDataset,
+        summary,
+        trend,
+        weekdays,
+        forecast,
+        students: scopedDataset.students.map((student) => ({ ...student, metrics: getStudentMetrics(student) })),
+        reportId: receipt.id,
+        generatedAt: new Date(receipt.generatedAt).toISOString(),
+        filters: {
+          section: sectionFilter === "all" ? "All sections" : sectionFilter,
+          dateRange: rangeFilter === "all" ? "All dates" : rangeFilter === "recent10" ? "Recent 10 sessions" : "Recent 5 sessions",
+          studentSearchApplied: Boolean(studentFilter.trim()),
+        },
+      });
+      const url = URL.createObjectURL(new Blob([report], { type: "text/csv;charset=utf-8" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = analyticsReportFilename(reportDataset);
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      setReportError(error instanceof Error ? error.message : "Could not generate the analytics report.");
+    } finally {
+      setReportPending(false);
+    }
+  }
+
   if (!dataset.students.length) return <main className="page-analytics">
     <PageHeader title="Class analytics" description="Explore attendance patterns within the selected teaching class." actions={<Link className="button button-secondary" to="/classes">Manage classes</Link>} />
     <section className="panel"><EmptyState title={isLoading ? "Loading class data" : dataError ? "Analytics unavailable" : "No class data selected"} description={isLoading ? "Retrieving the selected class from PostgreSQL." : dataError || "Select an assigned class or import attendance before reviewing trends and projections."} /></section>
@@ -48,7 +105,8 @@ export function AnalyticsPage() {
 
   return (
     <main className="page-analytics">
-      <PageHeader title="Class analytics" description="Explore attendance patterns across recorded sessions and identify where follow-up may help." actions={<Link className="button button-secondary" to="/import"><FileUp size={15} /> Import attendance</Link>} />
+      <PageHeader title="Class analytics" description="Explore attendance patterns across recorded sessions and identify where follow-up may help." actions={<><button className="button button-secondary" type="button" onClick={() => void downloadReport()} disabled={reportPending || !activeClassId}><Download size={15} /> {reportPending ? "Preparing report…" : "Download report"}</button><Link className="button button-secondary" to="/import"><FileUp size={15} /> Import attendance</Link></>} />
+      {reportError && <p className="analytics-export-error" role="alert">Report wasn’t generated: {reportError}</p>}
       <div className="analytics-scope"><span className="scope-dot" /><span>{dataset.metadata.subjectTitle || "Current class"}</span><i />{dataset.metadata.term || "Current term"}<i />{scopedDataset.dates.length} selected dates</div>
       <section className="panel analytics-trend-panel">
         <div className="analytics-filters" aria-label="Analytics filters">

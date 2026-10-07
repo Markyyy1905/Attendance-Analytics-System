@@ -13,7 +13,7 @@
 .student-roster td:nth-child(2) { color: #7f8d84; font-size: .75rem; }
 .student-roster td:last-child { text-align: right; }
 .student-roster th:last-child { width: 100px; }
-.roster-rate { color: #33734f !important; font-weight: 650; }
+.roster-rate { color: #2563eb !important; font-weight: 650; }
 .student-avatar-1 { color: #715a86; background: #f0eafa; }.student-avatar-2 { color: #89643a; background: #f8f0e5; }.student-avatar-3 { color: #456981; background: #eaf2f6; }.student-avatar-4 { color: #865755; background: #f7eceb; }
 .students-threshold-note { margin: 13px 2px; color: #8b968f; font-size: .7rem; }
 @media (max-width: 780px) {

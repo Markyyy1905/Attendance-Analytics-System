@@ -1,6 +1,6 @@
 # Backend status
 
-Attendwise now has a local Node API, a PostgreSQL schema migration, and a persistence path for CSV imports matched by student name within class. The API listens only on loopback and should be used only for local development. Do not expose it to school networks or load live student records yet.
+TalaTrack now has a local Node API, a PostgreSQL schema migration, and a persistence path for CSV imports matched by student name within class. The API listens only on loopback and should be used only for local development. Do not expose it to school networks or load live student records yet.
 
 ## Required before a school pilot
 

@@ -1,12 +1,12 @@
-﻿.app-frame { min-height: 100vh; display: flex; }
+.app-frame { min-height: 100vh; display: flex; }
 .sidebar { width: 252px; position: fixed; inset: 0 auto 0 0; z-index: 20; display: flex; flex-direction: column; padding: 22px 15px 16px; background: var(--sidebar); border-right: 1px solid var(--line); }
 .brand-lockup { min-height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 7px; }
 .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; color: #fff; background: var(--brand); border-radius: 10px; }
 .brand-lockup > div:last-of-type { display: grid; gap: 1px; }
-.brand-lockup strong { color: #20322a; font: 750 .92rem "Manrope", sans-serif; letter-spacing: -.025em; }
+.brand-lockup strong { color: var(--ink); font: 750 .92rem "Manrope", sans-serif; letter-spacing: -.025em; }
 .brand-lockup span { color: #87938c; font-size: .68rem; }
 .workspace-switcher { display: flex; align-items: center; gap: 10px; margin: 27px 0 25px; padding: 11px 10px; background: #f7f9f8; border: 1px solid var(--line); border-radius: 9px; }
-.workspace-avatar { width: 32px; height: 32px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 8px; color: #28684e; background: #e4f1e9; font-size: .65rem; font-weight: 750; }
+.workspace-avatar { width: 32px; height: 32px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 8px; color: #1d4ed8; background: #eff6ff; font-size: .65rem; font-weight: 750; }
 .workspace-copy { min-width: 0; display: grid; flex: 1; gap: 2px; }
 .workspace-copy span { color: #87938c; font-size: .65rem; }
 .workspace-copy select { width: 100%; overflow: hidden; padding: 0 18px 0 0; color: #33463c; background: transparent; border: 0; outline-offset: 3px; font: 650 .73rem "DM Sans", sans-serif; text-overflow: ellipsis; white-space: nowrap; }
@@ -16,9 +16,9 @@
 .nav-section-spaced { margin-top: 22px; }
 .nav-link { min-height: 40px; display: flex; align-items: center; gap: 11px; padding: 0 11px; border-radius: 8px; color: #64736a; font-size: .83rem; font-weight: 550; transition: background .15s ease, color .15s ease; }
 .nav-link svg { color: #829087; }
-.nav-link:hover { color: #2b5441; background: #f4f8f5; }
-.nav-link-active { color: #145f42; background: #eaf4ed; font-weight: 650; }
-.nav-link-active svg { color: #24724f; }
+.nav-link:hover { color: #1d4ed8; background: #f3f7ff; }
+.nav-link-active { color: #1d4ed8; background: #eff6ff; font-weight: 650; }
+.nav-link-active svg { color: #2563eb; }
 .sidebar-foot { display: grid; gap: 12px; margin-top: auto; }
 .data-status { display: flex; gap: 9px; padding: 11px 10px; border: 1px solid var(--line); border-radius: 9px; }
 .status-indicator { width: 7px; height: 7px; flex: 0 0 auto; margin-top: 5px; border-radius: 50%; background: #49a274; box-shadow: 0 0 0 3px #eaf5ee; }
@@ -46,6 +46,29 @@
 .icon-button { width: 36px; height: 36px; display: inline-grid; place-items: center; color: #607067; background: transparent; border: 0; border-radius: 8px; cursor: pointer; }
 .icon-button:hover { color: #245d43; background: #edf4ef; }
 .mobile-menu, .mobile-close, .nav-scrim { display: none; }
+
+.sidebar { padding-top: 25px; border-right-color: #dfe7e1; }
+.brand-lockup strong { font-size: .97rem; }
+.brand-lockup span, .workspace-copy > span { color: #596c60; }
+.workspace-switcher { background: #f5f8f6; border-color: #e0e8e2; }
+.workspace-avatar { color: #1d4ed8; background: #eff6ff; }
+.nav-section-label { color: #586b60; letter-spacing: .065em; }
+.nav-link { min-height: 43px; color: #4f6257; }
+.nav-link svg { color: #61776a; }
+.nav-link-active { color: #1d4ed8; background: #eff6ff; }
+.nav-link-active svg { color: #2563eb; }
+.data-status { border-color: #e0e8e2; }
+.data-status strong { color: #33483b; }
+.data-status span, .sidebar-foot-note { color: #56695e; }
+.topbar { background: rgb(255 255 255 / 97%); }
+.breadcrumb { color: #5a6c61; }
+.breadcrumb strong, .teacher-profile strong, .teacher-selector { color: #34493c; }
+.prototype-badge { color: #56695e; }
+.teacher-profile span { color: #596a60; }
+.teacher-avatar { color: #285a40; background: #e7f1ea; }
+.icon-button { min-width: 40px; min-height: 40px; }
+.icon-button:hover { background: #e8f2eb; }
+.nav-link:focus-visible, .icon-button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 
 @media (max-width: 1100px) {
   .topbar { padding-inline: 26px; }

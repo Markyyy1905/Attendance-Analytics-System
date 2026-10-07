@@ -1,13 +1,13 @@
-# Attendwise
+# TalaTrack
 
-Attendwise is a multi-school attendance workspace built with React, TypeScript, Node.js, and PostgreSQL. School accounts, classes, enrollments, attendance, imports, sessions, and audit history persist in PostgreSQL. Browser storage is used only for non-sensitive UI preferences.
+TalaTrack is a multi-school attendance workspace built with React, TypeScript, Node.js, and PostgreSQL. School accounts, classes, enrollments, attendance, imports, sessions, and audit history persist in PostgreSQL. Browser storage is used only for non-sensitive UI preferences.
 
 ## Run locally
 
 1. Copy `.env.example` to `.env` and set `DATABASE_URL` for a PostgreSQL database you control.
 2. Install dependencies with `npm ci`.
 3. Apply versioned schema migrations with `npm run db:migrate`. The runner applies pending SQL migrations without printing connection details.
-4. Run `npm run api` in one terminal and `npm run dev` in another. The Vite development server proxies `/api` to port 4174.
+4. Run `npm run dev`. Vite serves the browser app and routes local `/api` requests to the current PostgreSQL API handler in this checkout; there is no second API terminal to start.
 5. Open the app and create the initial school workspace. Registration creates its administrator account. Use a unique email and a password with at least 12 characters.
 
 The application never seeds illustrative student records. The first school administrator can add staff accounts, assign classes, and import the provided attendance CSV template. Account sessions are opaque, server-side PostgreSQL records with HTTP-only cookies. Set `APP_ORIGINS` to the exact allowed site origins. Production requires HTTPS so session cookies use the `Secure` attribute.
@@ -20,9 +20,9 @@ The container exposes port 4174. The database migration command must be run with
 
 ## Deploy to Vercel
 
-The repository includes `vercel.json` for the Vite build and SPA deep links, plus a catch-all Node Function under `api/` that forwards requests to the PostgreSQL API. In Vercel, use the repository root, Vite framework preset, `npm ci`, `npm run build`, and `dist`. Add `DATABASE_URL`, `APP_ORIGINS` (the exact production HTTPS origin), and `NODE_ENV=production` under Project Settings → Environment Variables for Production. Add `PGSSL=require` if required by the database provider. The function pool defaults to two connections per warm instance; use a provider pooler when needed.
+The repository includes `vercel.json` for the Vite build, API-first routing, and SPA deep links. The `/api/*` rewrite targets `api/index.js`, which restores the requested API path before passing it to the shared PostgreSQL handler. In Vercel, use the repository root, Vite framework preset, `npm ci`, `npm run build`, and `dist`. Add `DATABASE_URL` and `NODE_ENV=production` under Project Settings → Environment Variables for Production. Same-origin requests are checked against the deployment host, so `APP_ORIGINS` is only needed for additional cross-origin clients; if used, list exact HTTPS origins separated by commas. Add `PGSSL=require` if required by the database provider. The function pool defaults to two connections per warm instance; use a provider pooler when needed.
 
-Preview deployments should use a separate test database and an `APP_ORIGINS` value matching the preview host you use. Never put database credentials in a `VITE_*` variable. The current schema migration has already been applied to the database configured in the local `.env`; apply migrations to any different Vercel database before creating accounts. Vercel builds the frontend and Functions; it does not run the container Dockerfile.
+Preview deployments should use a separate test database. Same-origin preview requests use their own deployment host; add a preview host to `APP_ORIGINS` only when calling the API cross-origin. Never put database credentials in a `VITE_*` variable. The current schema migration has already been applied to the database configured in the local `.env`; apply migrations to any different Vercel database before creating accounts. Vercel builds the frontend and Functions; it does not run the container Dockerfile.
 ## Product functions
 
 - School signup and secure login/logout, administrator-managed staff accounts, session expiry, login throttling, and server-side school/class authorization.

@@ -35,7 +35,7 @@ export function AppShell() {
       <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
         <div className="brand-lockup">
           <div className="brand-mark"><GraduationCap size={20} strokeWidth={1.9} /></div>
-          <div><strong>Attendwise</strong><span>Attendance insights</span></div>
+          <div><strong>TalaTrack</strong><span>Attendance insights</span></div>
           <button className="icon-button mobile-close" aria-label="Close navigation" onClick={() => setMenuOpen(false)}><X size={18} /></button>
         </div>
 

@@ -1,4 +1,4 @@
-# Product Requirements Document: Attendwise
+# Product Requirements Document: TalaTrack
 
 **Status:** Draft for school discovery
 **Product:** Teacher-facing attendance monitoring and analytics system
@@ -7,7 +7,7 @@
 
 ## 1. Summary
 
-Attendwise helps teachers and authorized school staff maintain reliable attendance records, understand class and student attendance patterns, and follow up with students who may need support. It should turn trusted attendance data into transparent, explainable summaries and timely human review. Analytics and predictions are decision support; staff remain responsible for interpreting context and choosing interventions.
+TalaTrack helps teachers and authorized school staff maintain reliable attendance records, understand class and student attendance patterns, and follow up with students who may need support. It should turn trusted attendance data into transparent, explainable summaries and timely human review. Analytics and predictions are decision support; staff remain responsible for interpreting context and choosing interventions.
 
 The repository supports CSV preview and PostgreSQL persistence, then presents dashboard, attendance history, student profiles, descriptive analytics, and a cautious class-level projection. Teachers can manage local teacher profiles, assign classes, switch workspaces, and review each section separately. The interface starts empty when the database has no attendance records. These workspace controls are not authentication: the local API does not verify a signed-in teacher and is not ready for operational school use. Any projection is planning context, not validated forecasting.
 
@@ -242,7 +242,7 @@ These are initial requirements to refine with the school and implementation team
 
 ## 12. Decisions required from the school
 
-1. What is the official system of record and is Attendwise read-only, a capture tool, or both?
+1. What is the official system of record and is TalaTrack read-only, a capture tool, or both?
 2. Which identity provider and roles/groups should supply access? What class assignment is authoritative?
 3. What statuses are supported and how do late, excused, school activity, partial-day, and unknown marks affect rates?
 4. What is the official attendance formula and reporting period? How are enrollment changes and missing sessions treated?
@@ -340,7 +340,7 @@ Profiles show name, class/section, grade, effective enrollment, period, rate/den
 
 Class report contains school/class/section/grade, term/date range, generation time/timezone, freshness/source, policy/formula, student count, P/A/L/E/blank totals, aggregate rate/denominator, session trend and student roster with names, rates, counts, and review reasons. Individual report contains student name/class/grade/enrollment, period/time, formula/policy, rate/denominator, status totals, full session history, flags, and permitted follow-up status.
 
-Filters include authorized school scope, class, term, date range, status, optional student. Faculty generate assigned-class reports; coordinators and department heads their assigned scope; administrators school-wide. PDF uses the report layout. Excel summary has Summary, Session Trend, and Roster sheets. Analytics CSV contains filtered session facts and metric definitions, excluding restricted notes. Filename: attendwise_<type>_<class-or-student>_<start>_<end>_<generated-UTC>.<ext>, with sanitized identifiers. Empty reports state no data and retain filters/time; empty CSV contains headers. All generation and exports are logged.
+Filters include authorized school scope, class, term, date range, status, optional student. Faculty generate assigned-class reports; coordinators and department heads their assigned scope; administrators school-wide. PDF uses the report layout. Excel summary has Summary, Session Trend, and Roster sheets. Analytics CSV contains filtered session facts and metric definitions, excluding restricted notes. Filename: TalaTrack_<type>_<class-or-student>_<start>_<end>_<generated-UTC>.<ext>, with sanitized identifiers. Empty reports state no data and retain filters/time; empty CSV contains headers. All generation and exports are logged.
 
 ### 15.8 Relational database model
 
