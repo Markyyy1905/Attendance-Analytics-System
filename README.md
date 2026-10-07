@@ -18,6 +18,11 @@ The included Dockerfile builds the frontend and serves it and the API from one N
 
 The container exposes port 4174. The database migration command must be run with the same database configuration as the application. Keep `.env` and all provider secrets out of source control and client-side `VITE_*` variables.
 
+## Deploy to Vercel
+
+The repository includes `vercel.json` for the Vite build and SPA deep links, plus a catch-all Node Function under `api/` that forwards requests to the PostgreSQL API. In Vercel, use the repository root, Vite framework preset, `npm ci`, `npm run build`, and `dist`. Add `DATABASE_URL`, `APP_ORIGINS` (the exact production HTTPS origin), and `NODE_ENV=production` under Project Settings → Environment Variables for Production. Add `PGSSL=require` if required by the database provider. The function pool defaults to two connections per warm instance; use a provider pooler when needed.
+
+Preview deployments should use a separate test database and an `APP_ORIGINS` value matching the preview host you use. Never put database credentials in a `VITE_*` variable. The current schema migration has already been applied to the database configured in the local `.env`; apply migrations to any different Vercel database before creating accounts. Vercel builds the frontend and Functions; it does not run the container Dockerfile.
 ## Product functions
 
 - School signup and secure login/logout, administrator-managed staff accounts, session expiry, login throttling, and server-side school/class authorization.
