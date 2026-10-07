@@ -20,7 +20,7 @@
 .class-count svg { color: #819087; }
 .class-date { display: block; color: #4b5e52; }
 .class-source { display: block; max-width: 180px; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; }
-.class-open { min-height: 34px; padding: 0 10px; font-size: .69rem; white-space: nowrap; }
+.class-open { min-height: 42px; padding: 0 10px; font-size: .74rem; white-space: nowrap; }
 .class-open:disabled { color: #2563eb; background: #eff6ff; border-color: #dbeafe; cursor: default; }
 .class-empty { display: grid; justify-items: center; gap: 9px; min-height: 225px; padding: 34px; color: #829087; background: #fff; border: 1px solid var(--line); border-radius: 10px; text-align: center; }
 .class-empty > svg { color: #55916d; }
@@ -38,14 +38,3 @@
 .teacher-management-row > div { display: grid; gap: 3px; }
 .teacher-management-row > div span { color: #87938b; font-size: .67rem; }
 .teacher-management-row > div strong { color: #405348; font-size: .79rem; }
-.add-teacher-details { position: relative; }
-.add-teacher-details summary { display: flex; align-items: center; gap: 6px; padding: 8px 10px; color: #1d4ed8; border: 1px solid #dbeafe; border-radius: 7px; font-size: .72rem; font-weight: 650; cursor: pointer; list-style: none; }
-.add-teacher-details summary::-webkit-details-marker { display: none; }
-.add-teacher-details form { width: min(340px, calc(100vw - 42px)); position: absolute; z-index: 5; top: calc(100% + 8px); right: 0; display: grid; gap: 11px; padding: 15px; background: #fff; border: 1px solid var(--line); border-radius: 9px; box-shadow: 0 10px 28px rgb(25 43 33 / 12%); }
-.add-teacher-details label { display: grid; gap: 5px; color: #69796f; font-size: .69rem; font-weight: 600; }
-.add-teacher-details input { height: 36px; padding: 0 9px; border: 1px solid var(--line); border-radius: 6px; background: #fff; font: inherit; }
-.add-teacher-details .button { justify-content: center; }
-.class-management-error { padding: 9px 11px; margin: 0 0 12px; color: #9a413a; background: #fff4f2; border: 1px solid #efd8d4; border-radius: 7px; font-size: .75rem; }
-.class-row-actions { display: flex; align-items: center; gap: 8px; }
-.class-unassign { padding: 6px 3px; color: #9b5a48; background: transparent; border: 0; font: 600 .68rem "DM Sans",sans-serif; cursor: pointer; }
-.class-unassign:disabled { opacity: .5; cursor: wait; }

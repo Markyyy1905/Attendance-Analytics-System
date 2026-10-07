@@ -33,3 +33,15 @@
  .student-history-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+@media (max-width: 800px) {
+  .student-detail-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 0; }
+  .student-detail-metrics > div { padding-inline: 12px; }
+  .student-detail-metrics > div:nth-child(3n) { border-right: 0; }
+}
+@media (max-width: 600px) {
+  .student-detail-metrics > div:nth-child(3n) { border-right: 1px solid var(--line); }
+  .student-detail-metrics > div:nth-child(2n) { border-right: 0; }
+}
+@media (max-width: 600px) {
+  .student-detail-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

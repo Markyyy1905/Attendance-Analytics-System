@@ -1,0 +1,6 @@
+﻿.no-students-state { display:grid; justify-items:start; gap:14px; max-width:620px; padding:30px; margin:0 auto; }
+.no-students-icon { width:44px; height:44px; display:grid; place-items:center; color:var(--brand-dark); background:var(--brand-pale); border-radius:12px; }
+.no-students-state h2 { margin:0; color:var(--ink); font:650 1.12rem/1.35 "Manrope",sans-serif; letter-spacing:-.02em; }
+.no-students-state p { max-width:48ch; margin:7px 0 0; color:var(--muted-strong); font-size:.9rem; line-height:1.55; }
+.no-students-state .button { min-height:44px; margin-top:2px; }
+@media(max-width:520px) { .no-students-state { justify-items:stretch; padding:22px 16px; } .no-students-state .button { width:100%; } }

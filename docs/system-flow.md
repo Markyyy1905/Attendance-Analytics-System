@@ -1,17 +1,20 @@
 # System flow
 
 ```text
-Upload ? Validate ? Preview ? Split by class/section ? Commit to PostgreSQL ? Select teacher workspace/class ? Calculate ? Dashboard ? Monitor students ? Detect review flags ? Analyze trends / class projection
+Sign in -> Select assigned class -> Upload CSV -> Validate -> Preview -> Process sections -> Commit to PostgreSQL
+  -> Calculate shared metrics -> Dashboard and attendance matrix -> Review students and trends -> Detect review flags
+  -> Generate analytics CSV -> Export
 ```
 
-1. Staff selects the provided CSV template and uploads a file.
-2. The browser checks file type and size, headers, ISO dates, duplicate student names, and attendance values.
-3. It shows row-level errors and warnings with an attendance preview. Invalid files cannot be committed.
-4. Staff commits the valid preview. The local API separates each section block, then writes import metadata, student, class assignment, session, attendance, and audit records in one PostgreSQL transaction.
-5. If the transaction fails, PostgreSQL rolls back the commit and the UI reports that the data was not saved.
-6. The teacher workspace shows class assignments. Selecting a class loads only that class's PostgreSQL records; refresh reloads the selected records. There is no mock-data fallback.
-7. Rate is (P + L) / (P + L + A); excused and blank are excluded from its denominator. Coverage counts known statuses separately so missing records remain visible. Review flags explain the evidence for each OR condition. Trends include eligible denominators, coverage, and weekday summaries. A recency-weighted class projection is shown only with at least six sessions and 60% roster coverage, with a 90% planning interval; it is not a validated prediction.
+1. Staff sign in; the API resolves an active PostgreSQL session and school scope.
+2. Staff select an assigned class or upload a CSV. CSV files are limited to 5 MB and 20,000 student rows / 200 session dates.
+3. The browser validates the CSV structure, ISO dates, student names, duplicate rows, and P/A/L/E/blank marks. The preview shows row errors, warnings, class sections, and sample calculations.
+4. Missing required headers, malformed dates/quotes, unsupported marks, duplicate students within a class block, empty content, or size-limit violations prevent commit. Staff correct the source file and upload it again; existing data remains intact.
+5. A valid preview is split by section and sent to the authenticated API. PostgreSQL writes class, enrollment, session, marks, import metadata, row outcomes, and audit events in a transaction. Failure rolls back the import and reports an error.
+6. The selected class dataset is loaded from PostgreSQL. Dashboard, attendance matrix, student profile, analytics, and export use the same committed records and shared calculations.
+7. Attendance rate is `(P + L) / (P + L + A)`. Excused and blank marks do not enter the rate denominator; blank marks remain unrecorded and lower roster coverage.
+8. Review flags use OR: rate below 75%, five or more consecutive absences, or more than eight absences. Each flag is a prompt for human review.
+9. Trend and weekday charts show denominators and coverage and have data-table detail. A class-level projection appears only when at least six sessions meet 60% roster coverage. It is exploratory planning context, not a validated prediction.
+10. Class analytics can be exported as CSV. Generation metadata is logged. A report/export failure is shown to staff; source attendance remains unchanged.
 
-An empty database shows an explicit empty state and prompts staff to import attendance. If the API or database is unreachable, the UI reports the connection failure and does not substitute sample records.
-
-The API is restricted to loopback for local development. Teacher/class assignment currently organizes local workspaces but does not authenticate the selected teacher. Identity, enforceable authorization, production hosting, and privacy operations are required before using school records outside local development.
+The deployment must use the configured server-only `DATABASE_URL`. The application has account login and class access checks, but it is not yet a school-approved operational service. Approved policy, identifier matching, retention/deletion, backups/recovery, monitoring, privacy review, password recovery, email verification, and accessibility validation remain launch gates.

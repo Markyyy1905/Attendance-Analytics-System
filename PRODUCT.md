@@ -4,7 +4,7 @@
 
 ## Platform
 
-Web application. React, TypeScript, and Vite serve the client; a Node.js API and PostgreSQL provide persisted school workspaces. The repository supports local Vite development and Vercel deployment.
+web
 
 ## Users
 

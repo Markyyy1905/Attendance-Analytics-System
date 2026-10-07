@@ -1,14 +1,14 @@
-# Backend status
+﻿# Pilot implementation status
 
-TalaTrack now has a local Node API, a PostgreSQL schema migration, and a persistence path for CSV imports matched by student name within class. The API listens only on loopback and should be used only for local development. Do not expose it to school networks or load live student records yet.
+TalaTrack now runs a React/TypeScript client, a shared Node.js API, and PostgreSQL persistence locally and through a Vercel function. Staff can register a school workspace, sign in, manage accounts and class assignments, import attendance CSVs, review class/student attendance, inspect descriptive analytics and an exploratory class-level projection, and export class analytics as CSV. Attendance and account data are stored in PostgreSQL; browser storage holds only interface preferences.
 
-## Required before a school pilot
+## Remaining gates before a school pilot
 
-1. Add school OIDC login/logout and server-side authorization for faculty, coordinators, department heads, and administrators.
-2. Restrict every read, correction, import, and export to validated staff class assignments and school tenancy.
-3. Add staged import conflict resolution, rollback/reprocessing, and duplicate reconciliation.
-4. Approve the calendar, attendance formula, thresholds, retention period, and timezone with the school.
-5. Add restricted follow-up notes, flag acknowledgement history, class/student reports, and logged exports.
-6. Implement encrypted backups, restore drills, monitoring, incident handling, and deletion/retention automation.
+1. Agree and version attendance policy, calendar, thresholds, timezone, reporting period, and effective enrollment rules with the school.
+2. Replace name-based student matching with an approved stable identifier and validate representative import files.
+3. Add email verification, account recovery, MFA or school SSO, and complete role review.
+4. Add attendance-taking/correction workflow, staged conflict resolution, rollback/reprocessing, and restricted follow-up records.
+5. Configure retention/deletion, encrypted backups, restore drills, monitoring, support, privacy/incident response, and accessibility validation.
+6. Validate the exploratory projection on representative historical cohorts before presenting it as a forecast; it currently serves only as planning context.
 
-The current local import service is not a production authorization boundary. The `DATABASE_URL` value is server-only and must never be prefixed with `VITE_` or shipped to browsers.
+The current deployment is configured for Vercel. The Dockerfile is an optional container deployment path. `DATABASE_URL` is server-only and must never be prefixed with `VITE_` or sent to browsers. Apply database migrations separately to each deployment database before using it.

@@ -13,6 +13,11 @@ colors:
   brand-pale: "#eff6ff"
   accent: "#bb6c28"
   danger: "#b94b46"
+  present: "#15803d"
+  absent: "#b94b46"
+  late: "#bb6c28"
+  excused: "#64748b"
+  unrecorded: "#cbd5e1"
 typography:
   display:
     fontFamily: "Manrope, Segoe UI, sans-serif"

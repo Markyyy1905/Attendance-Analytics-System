@@ -119,7 +119,7 @@ export function getWeekdayTrend(dataset: AttendanceDataset) {
     current.expected += point.expected;
     groups.set(weekday, current);
   }
-  return [...groups.entries()].sort(([a], [b]) => a - b).map(([, group]) => {
+  return [...groups.entries()].sort(([a], [b]) => ((a + 6) % 7) - ((b + 6) % 7)).map(([, group]) => {
     const denominator = group.present + group.absent + group.late;
     const coverage = group.expected ? Math.round(((group.expected - group.unrecorded) / group.expected) * 100) : 0;
     return { ...group, rate: denominator ? Math.round(((group.present + group.late) / denominator) * 100) : 0, denominator, coverage };

@@ -1,8 +1,9 @@
-﻿import { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { FileUp, Search, SlidersHorizontal } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AttendanceMark, RiskLabel } from "../../../components/ui/AttendanceMark";
 import { PageHeader } from "../../../components/ui/PageHeader";
+import { NoStudentsState } from "../../../components/ui/NoStudentsState";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { getStatusForDate, getStudentMetrics } from "../../../shared/lib/attendanceMetrics";
 import "./AttendancePage.css";
@@ -27,10 +28,10 @@ export function AttendancePage() {
 
   return (
     <main className="page-attendance">
-      <PageHeader title="Attendance records" description="Review each studentâ€™s attendance by class date, all in one place." actions={<Link className="button button-primary" to="/import"><FileUp size={16} /> Import a file</Link>} />
+      <PageHeader title="Attendance records" description="Review each student attendance by class date, all in one place." actions={<Link className="button button-primary" to="/import"><FileUp size={16} /> Import a file</Link>} />
 
       <div className="attendance-summary-line">
-        <div><strong>{dataset.metadata.subjectTitle || "Class attendance"}</strong><span>{[dataset.metadata.subjectCode, dataset.metadata.program, dataset.sections.join(", ")].filter(Boolean).join(" Â· ")}</span></div>
+        <div><strong>{dataset.metadata.subjectTitle || "Class attendance"}</strong><span>{[dataset.metadata.subjectCode, dataset.metadata.program, dataset.sections.join(", ")].filter(Boolean).join("  /  ")}</span></div>
         <span className="records-count">{students.length} of {dataset.students.length} students</span>
       </div>
 
@@ -47,14 +48,14 @@ export function AttendancePage() {
             <tbody>{students.map((student) => {
               const metrics = getStudentMetrics(student);
               return <tr key={student.id}>
-                <td className="student-col"><div className="student-name-cell"><span className="student-avatar">{initials(student.name)}</span><span className="student-name-copy"><strong>{student.name}</strong><span>{student.program} Â· {student.section}</span></span></div></td>
+                <td className="student-col"><div className="student-name-cell"><span className="student-avatar">{initials(student.name)}</span><span className="student-name-copy"><strong>{student.name}</strong><span>{student.program}  /  {student.section}</span></span></div></td>
                 {visibleDates.map((date) => <td key={`${student.id}-${date}`} className="mark-cell"><AttendanceMark status={getStatusForDate(student, date)} /></td>)}
                 <td className={metrics.attendanceRate !== null && metrics.attendanceRate < 75 ? "rate-low" : "rate-normal"}>{metrics.attendanceRate === null ? "—" : `${metrics.attendanceRate}%`}</td><td>{metrics.present}</td><td>{metrics.absent}</td><td>{metrics.late}</td><td><RiskLabel reasons={metrics.riskReasons} /></td>
               </tr>;
             })}</tbody>
           </table>
-        </div> : <div className="empty-state attendance-empty"><div className="empty-state-mark">â€”</div><strong>{dataset.students.length ? "No students match these filters" : "No class attendance selected"}</strong><span>{dataset.students.length ? "Try a different name or attendance filter." : "Select an assigned class or import attendance data to see the matrix."}</span></div>}
-        <div className="attendance-table-footer"><span>Rate = (present + late) Ã· (present + late + absent). Excused and blank records are excluded.</span><span>{visibleDates.length} dates shown</span></div>
+        </div> : dataset.students.length ? <div className="empty-state attendance-empty"><div className="empty-state-mark">-</div><strong>No students match these filters</strong><span>Try a different name or attendance filter.</span></div> : <NoStudentsState />}
+        <div className="attendance-table-footer"><span>Rate = (present + late)  /  (present + late + absent). Excused and blank records are excluded.</span><span>{visibleDates.length} dates shown</span></div>
       </section>
       <div className="attendance-source-hint">Source: <strong>{dataset.sourceName}</strong>. Status marks are shown as recorded in the file.</div>
     </main>

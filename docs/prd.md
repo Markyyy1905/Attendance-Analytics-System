@@ -226,7 +226,7 @@ Students are the people represented by the records, not direct users of the init
 
 The school must approve and version the formula before operational use. Every displayed rate must define: included statuses in numerator and denominator; handling of late, excused, school activity, partial day, unknown and missing; expected sessions; enrollment start/end; rounding; reporting period; and timezone. “Attendance rate” must not silently mean different things in different views.
 
-The existing prototype's `present / recorded marks` and risk rules (below 75%, at least five consecutive absences, more than eight absences) are placeholders from the brief, not approved policy. Define whether thresholds are inclusive, whether any rule independently triggers review, how blanks/holidays affect streaks, whether thresholds vary by age/program, and who may change them.
+The current implementation calculates `(present + late) / (present + late + absent)`, rounds the displayed rate to the nearest whole percent, and excludes excused and blank marks from that denominator. Review flags currently trigger independently when the unrounded rate is below 75%, the recorded streak reaches five absences, or recorded absences exceed eight. These are transparent pilot assumptions, not school-approved policy. Confirm boundary behavior, streak treatment across missing sessions, exceptions, differences by program, and who may change policy before operational use.
 
 ## 11. Non-functional requirements
 

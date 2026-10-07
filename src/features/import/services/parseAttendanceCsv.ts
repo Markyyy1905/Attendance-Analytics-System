@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   AttendanceCode,
   AttendanceDataset,
   AttendanceMetadata,
@@ -149,7 +149,7 @@ export function parseAttendanceCsv(text: string, sourceName = "attendance.csv"):
       if (datedColumns.length > 200) errors.push({ row: row.line, message: "The file exceeds the 200-session-column limit." });
       const invalidDates = datedColumns.filter((column) => !column.date || (hasNamedColumns && !/^\d{4}-\d{2}-\d{2}$/.test(column.value)));
       if (invalidDates.length) {
-        errors.push({ row: row.line, message: `Attendance column â€œ${invalidDates[0].value}â€ is not a recognized date.` });
+        errors.push({ row: row.line, message: `Attendance column "${invalidDates[0].value}" is not a recognized date.` });
       }
       const dates = datedColumns.flatMap((column) => column.date ? [column.date] : []);
       if (unique(dates).length !== dates.length) errors.push({ row: row.line, message: "This section has duplicate attendance dates in its header." });
@@ -230,9 +230,9 @@ export function parseAttendanceCsv(text: string, sourceName = "attendance.csv"):
   const combinedMetadata: AttendanceMetadata = {
     ...firstMetadata,
     subjectTitle: titles.length > 1 ? "Multiple subjects" : titles[0] ?? "",
-    subjectCode: codes.length > 1 ? codes.join(" Â· ") : codes[0] ?? "",
+    subjectCode: codes.length > 1 ? codes.join("  /  ") : codes[0] ?? "",
     term: terms.length > 1 ? "Multiple terms" : terms[0] ?? "",
-    program: programs.join(" Â· "),
+    program: programs.join("  /  "),
     section: sections.length > 1 ? `${sections.length} sections` : sections[0] ?? "",
     scheduleDays: unique(validBlocks.flatMap((block) => block.metadata.scheduleDays)),
     scheduleTimes: unique(validBlocks.flatMap((block) => block.metadata.scheduleTimes)),

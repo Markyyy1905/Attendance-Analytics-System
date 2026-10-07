@@ -32,7 +32,7 @@ export function AppShell() {
   return (
     <div className="app-frame">
       {menuOpen && <button className="nav-scrim" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
-      <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
+      <aside id="sidebar-navigation" className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
         <div className="brand-lockup">
           <div className="brand-mark"><GraduationCap size={20} strokeWidth={1.9} /></div>
           <div><strong>TalaTrack</strong><span>Attendance insights</span></div>
@@ -54,6 +54,7 @@ export function AppShell() {
               <Icon size={18} strokeWidth={1.8} /><span>{label}</span>
             </NavLink>
           ))}
+          {(user?.roles.includes("administrator") || user?.roles.includes("technical_administrator")) && <NavLink to="/staff" className={({ isActive }) => `nav-link ${isActive ? "nav-link-active" : ""}`} onClick={() => setMenuOpen(false)}><UsersRound size={18} strokeWidth={1.8} /><span>Staff and access</span></NavLink>}
           <span className="nav-section-label nav-section-spaced">Data</span>
           <NavLink to="/import" className={({ isActive }) => `nav-link ${isActive ? "nav-link-active" : ""}`} onClick={() => setMenuOpen(false)}>
             <FileSpreadsheet size={18} strokeWidth={1.8} /><span>Import attendance</span>
@@ -68,7 +69,7 @@ export function AppShell() {
 
       <div className="app-main">
         <header className="topbar">
-          <button className="icon-button mobile-menu" aria-label="Open navigation" onClick={() => setMenuOpen(true)}><Menu size={20} /></button>
+          <button className="icon-button mobile-menu" aria-label="Open navigation" aria-expanded={menuOpen} aria-controls="sidebar-navigation" onClick={() => setMenuOpen(true)}><Menu size={20} /></button>
           <div className="breadcrumb"><span>Workspace</span><span className="breadcrumb-separator">/</span><strong>{dataset.metadata.section ? `${dataset.metadata.section} · ${dataset.metadata.term}` : "Attendance overview"}</strong></div>
           <div className="topbar-tools">
             <span className="prototype-badge"><span />{dataError ? " Database offline" : isLoading ? " Connecting…" : " PostgreSQL"}</span>

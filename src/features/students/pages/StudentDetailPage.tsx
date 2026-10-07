@@ -6,6 +6,7 @@ import { PageHeader } from "../../../components/ui/PageHeader";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { getDateTrend, getStudentMetrics } from "../../../shared/lib/attendanceMetrics";
 import { EmptyState } from "../../../components/ui/PageHeader";
+import { NoStudentsState } from "../../../components/ui/NoStudentsState";
 import "./StudentDetailPage.css";
 
 function initials(name: string) { return name.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase(); }
@@ -13,8 +14,11 @@ function formatDate(date: string) { return new Intl.DateTimeFormat("en", { month
 
 export function StudentDetailPage() {
   const { studentId } = useParams();
-  const { dataset } = useAttendanceData();
+  const { dataset, isLoading, dataError } = useAttendanceData();
   const student = dataset.students.find((item) => item.id === studentId);
+  if (!student && isLoading) return <main className="student-detail"><PageHeader title="Student profile" description="Attendance history for this student in the current class." /><EmptyState title="Loading student records" description="Retrieving saved attendance from PostgreSQL." /></main>;
+  if (!student && dataError && !dataset.students.length) return <main className="student-detail"><PageHeader title="Student profile unavailable" description="The student roster could not be loaded." /><EmptyState title="Database connection unavailable" description={dataError} /></main>;
+  if (!student && !dataset.students.length) return <main className="student-detail"><PageHeader title="Student profile" description="Student attendance history appears after class records are imported." /><NoStudentsState /></main>;
   if (!student) return <main className="student-detail"><PageHeader title="Student not found" description="This student is not in the current attendance dataset." actions={<Link className="button button-secondary" to="/students"><ArrowLeft size={15} /> Back to students</Link>} /><EmptyState title="Choose a student from the class roster" description="The current dataset may have changed since this profile link was opened." /></main>;
 
   const metrics = getStudentMetrics(student);

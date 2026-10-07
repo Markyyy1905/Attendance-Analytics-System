@@ -91,3 +91,7 @@
   .teacher-selector { max-width: 105px; }
   .main-content { padding: 23px 16px 42px; }
 }
+@media (max-width: 760px) {
+  .sidebar { visibility: hidden; transition: transform .22s cubic-bezier(.22,1,.36,1), visibility 0s linear .22s; }
+  .sidebar-open { visibility: visible; transition-delay: 0s; }
+}

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { AttendanceTrendChart } from "../../../components/charts/AttendanceTrendChart";
 import { AttendanceMark, RiskLabel } from "../../../components/ui/AttendanceMark";
 import { EmptyState, PageHeader, SectionTitle } from "../../../components/ui/PageHeader";
+import { NoStudentsState } from "../../../components/ui/NoStudentsState";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { getDateTrend, getDatasetSummary, getStudentMetrics } from "../../../shared/lib/attendanceMetrics";
 import "./OverviewPage.css";
@@ -32,9 +33,9 @@ export function OverviewPage() {
 
   if (!dataset.students.length) {
     return <main className="page-overview">
-      <PageHeader title="Attendance overview" description="Attendance summaries appear after records are saved to PostgreSQL." actions={<Link className="button button-primary" to="/import"><FileUp size={16} /> Upload attendance</Link>} />
+      <PageHeader title="Attendance overview" description="Attendance summaries appear after records are saved to PostgreSQL." />
       <section className="panel">
-        <EmptyState title={isLoading ? "Loading attendance data" : dataError ? "Database connection unavailable" : "No attendance data saved"} description={isLoading ? "Connecting to PostgreSQL." : dataError || "Upload a valid class CSV with student names to add attendance records to PostgreSQL."} />
+        {isLoading ? <EmptyState title="Loading attendance data" description="Connecting to PostgreSQL." /> : dataError ? <EmptyState title="Database connection unavailable" description={dataError} /> : <NoStudentsState />}
       </section>
     </main>;
   }
