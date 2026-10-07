@@ -1,21 +1,21 @@
-.students-overview-strip { display: flex; gap: 0; margin: -2px 0 21px; padding: 14px 16px; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
+.students-overview-strip { display: flex; gap: 0; margin: -2px 0 21px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 .students-overview-strip > div { min-width: 150px; display: grid; gap: 4px; padding: 1px 20px; border-right: 1px solid var(--line); }
 .students-overview-strip > div:first-child { padding-left: 3px; }
 .students-overview-strip > div:last-child { border-right: 0; }
-.students-overview-strip strong { color: #2b4034; font: 700 1.28rem/1.2 "Manrope", sans-serif; font-variant-numeric: tabular-nums; }
-.students-overview-strip span { color: #819087; font-size: .72rem; }
+.students-overview-strip strong { color: #3fb950; font: 700 1.28rem/1.2 "Manrope", sans-serif; font-variant-numeric: tabular-nums; }
+.students-overview-strip span { color: var(--muted-strong); font-size: .72rem; }
 .students-panel { padding: 0; overflow: hidden; }
 .students-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 19px 18px; border-bottom: 1px solid var(--line); }
-.students-toolbar h2 { margin: 0; color: #304439; font: 650 1rem "Manrope", sans-serif; }
-.students-toolbar p { margin: 5px 0 0; color: #87938b; font-size: .74rem; }
+.students-toolbar h2 { margin: 0; color: #3fb950; font: 650 1rem "Manrope", sans-serif; }
+.students-toolbar p { margin: 5px 0 0; color: var(--muted-strong); font-size: .74rem; }
 .students-filters { display: flex; align-items: center; gap: 9px; }
 .students-filters .search-control { width: 220px; }
-.student-roster td:nth-child(2) { color: #7f8d84; font-size: .75rem; }
+.student-roster td:nth-child(2) { color: var(--muted-strong); font-size: .75rem; }
 .student-roster td:last-child { text-align: right; }
 .student-roster th:last-child { width: 100px; }
-.roster-rate { color: #2563eb !important; font-weight: 650; }
-.student-avatar-1 { color: #715a86; background: #f0eafa; }.student-avatar-2 { color: #89643a; background: #f8f0e5; }.student-avatar-3 { color: #456981; background: #eaf2f6; }.student-avatar-4 { color: #865755; background: #f7eceb; }
-.students-threshold-note { margin: 13px 2px; color: #8b968f; font-size: .7rem; }
+.roster-rate { color: #58a6ff !important; font-weight: 650; }
+.student-avatar-1 { color: #d2a8ff; background: #30263d; }.student-avatar-2 { color: #e3b341; background: #3b3020; }.student-avatar-3 { color: #79c0ff; background: #1b2c3f; }.student-avatar-4 { color: #ff7b72; background: #3d2929; }
+.students-threshold-note { margin: 13px 2px; color: var(--muted); font-size: .7rem; }
 @media (max-width: 780px) {
   .students-overview-strip { justify-content: space-between; padding-inline: 9px; }
   .students-overview-strip > div { min-width: 0; padding-inline: 10px; }

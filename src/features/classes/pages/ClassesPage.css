@@ -1,40 +1,40 @@
 .page-classes { min-width: 0; }
-.class-workspace-toolbar { display: flex; align-items: center; gap: 14px; padding: 14px 16px; margin-bottom: 15px; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
-.class-search { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 180px; color: #819087; }
-.class-search input { width: 100%; height: 38px; padding: 0 10px; color: var(--ink); border: 1px solid var(--line); border-radius: 7px; background: #fff; font: inherit; }
-.class-term-filter { display: flex; align-items: center; gap: 8px; color: #6d7b72; font-size: .75rem; }
-.class-term-filter select { height: 38px; min-width: 150px; padding: 0 10px; color: var(--ink-soft); border: 1px solid var(--line); border-radius: 7px; background: #fff; font: inherit; }
-.class-result-count { color: #718077; font-size: .75rem; white-space: nowrap; }
-.class-table-wrap { overflow-x: auto; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
+.class-workspace-toolbar { display: flex; align-items: center; gap: 14px; padding: 14px 16px; margin-bottom: 15px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.class-search { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 180px; color: var(--muted-strong); }
+.class-search input { width: 100%; height: 38px; padding: 0 10px; color: var(--ink); border: 1px solid var(--line); border-radius: 7px; background: var(--surface); font: inherit; }
+.class-term-filter { display: flex; align-items: center; gap: 8px; color: var(--muted-strong); font-size: .75rem; }
+.class-term-filter select { height: 38px; min-width: 150px; padding: 0 10px; color: var(--ink-soft); border: 1px solid var(--line); border-radius: 7px; background: var(--surface); font: inherit; }
+.class-result-count { color: var(--muted-strong); font-size: .75rem; white-space: nowrap; }
+.class-table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 .class-table { width: 100%; border-collapse: collapse; white-space: nowrap; text-align: left; }
-.class-table th { height: 43px; padding: 0 15px; color: #839087; background: #f8faf8; border-bottom: 1px solid var(--line); font-size: .68rem; font-weight: 650; }
-.class-table td { height: 68px; padding: 9px 15px; color: #58685e; border-bottom: 1px solid #edf1ee; font-size: .76rem; }
+.class-table th { height: 43px; padding: 0 15px; color: var(--muted-strong); background: var(--surface-soft); border-bottom: 1px solid var(--line); font-size: .68rem; font-weight: 650; }
+.class-table td { height: 68px; padding: 9px 15px; color: var(--muted-strong); border-bottom: 1px solid var(--line); font-size: .76rem; }
 .class-table tr:last-child td { border-bottom: 0; }
-.class-row-active { background: #f5f8ff; }
+.class-row-active { background: var(--brand-pale); }
 .class-name { display: flex; align-items: center; gap: 10px; min-width: 205px; }
-.class-icon { width: 34px; height: 34px; display: grid; place-items: center; color: #2563eb; background: #eff6ff; border-radius: 8px; }
+.class-icon { width: 34px; height: 34px; display: grid; place-items: center; color: #58a6ff; background: var(--brand-pale); border-radius: 8px; }
 .class-name > span:last-child { display: grid; gap: 4px; }
-.class-name strong { color: #364a3e; font-size: .78rem; font-weight: 650; }
-.class-name small, .class-source { color: #89958d; font-size: .67rem; }
-.class-count { display: inline-flex; align-items: center; gap: 6px; color: #607268; }
-.class-count svg { color: #819087; }
-.class-date { display: block; color: #4b5e52; }
+.class-name strong { color: #3fb950; font-size: .78rem; font-weight: 650; }
+.class-name small, .class-source { color: var(--muted); font-size: .67rem; }
+.class-count { display: inline-flex; align-items: center; gap: 6px; color: var(--muted-strong); }
+.class-count svg { color: var(--muted-strong); }
+.class-date { display: block; color: var(--ink-soft); }
 .class-source { display: block; max-width: 180px; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; }
 .class-open { min-height: 42px; padding: 0 10px; font-size: .74rem; white-space: nowrap; }
-.class-open:disabled { color: #2563eb; background: #eff6ff; border-color: #dbeafe; cursor: default; }
-.class-empty { display: grid; justify-items: center; gap: 9px; min-height: 225px; padding: 34px; color: #829087; background: #fff; border: 1px solid var(--line); border-radius: 10px; text-align: center; }
-.class-empty > svg { color: #55916d; }
-.class-empty strong { color: #394d41; font-size: .9rem; }
+.class-open:disabled { color: #58a6ff; background: var(--brand-pale); border-color: #79c0ff; cursor: default; }
+.class-empty { display: grid; justify-items: center; gap: 9px; min-height: 225px; padding: 34px; color: var(--muted-strong); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; text-align: center; }
+.class-empty > svg { color: #3fb950; }
+.class-empty strong { color: #3fb950; font-size: .9rem; }
 .class-empty > span { max-width: 430px; font-size: .76rem; line-height: 1.55; }
 .class-empty .button { margin-top: 5px; }
-.class-workspace-note { margin: 12px 2px 0; color: #8a958e; font-size: .7rem; line-height: 1.5; }
+.class-workspace-note { margin: 12px 2px 0; color: var(--muted); font-size: .7rem; line-height: 1.5; }
 @media (max-width: 760px) {
   .class-workspace-toolbar { align-items: stretch; flex-direction: column; }
   .class-search, .class-term-filter, .class-term-filter select { width: 100%; }
   .class-result-count { align-self: flex-end; }
   .class-table { min-width: 820px; }
 }
-.teacher-management-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 15px; margin-bottom: 13px; background: #fff; border: 1px solid var(--line); border-radius: 9px; }
+.teacher-management-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 15px; margin-bottom: 13px; background: var(--surface); border: 1px solid var(--line); border-radius: 9px; }
 .teacher-management-row > div { display: grid; gap: 3px; }
-.teacher-management-row > div span { color: #87938b; font-size: .67rem; }
-.teacher-management-row > div strong { color: #405348; font-size: .79rem; }
+.teacher-management-row > div span { color: var(--muted-strong); font-size: .67rem; }
+.teacher-management-row > div strong { color: #3fb950; font-size: .79rem; }

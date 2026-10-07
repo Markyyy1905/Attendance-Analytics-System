@@ -2,22 +2,22 @@
 name: TalaTrack
 description: A clear workspace for teachers to review student attendance.
 colors:
-  ink: "#172033"
-  ink-soft: "#344256"
-  muted: "#68778b"
-  line: "#e4e9f0"
-  surface: "#ffffff"
-  canvas: "#f6f8fb"
-  brand: "#2563eb"
-  brand-dark: "#1d4ed8"
-  brand-pale: "#eff6ff"
-  accent: "#bb6c28"
-  danger: "#b94b46"
-  present: "#15803d"
-  absent: "#b94b46"
-  late: "#bb6c28"
-  excused: "#64748b"
-  unrecorded: "#cbd5e1"
+  ink: "#e6edf3"
+  ink-soft: "#c9d1d9"
+  muted: "#8b949e"
+  line: "#30363d"
+  surface: "#161b22"
+  canvas: "#0d1117"
+  brand: "#2f81f7"
+  brand-dark: "#1f6feb"
+  brand-pale: "#10284a"
+  accent: "#d29922"
+  danger: "#f07067"
+  present: "#3fb950"
+  absent: "#ff7b72"
+  late: "#e3b341"
+  excused: "#8b949e"
+  unrecorded: "#484f58"
 typography:
   display:
     fontFamily: "Manrope, Segoe UI, sans-serif"
@@ -58,19 +58,19 @@ components:
 
 **Creative North Star: "The teacher's clear workspace"**
 
-TalaTrack is a practical desktop workspace for teachers who need to understand class attendance quickly and follow up with students. It uses familiar school software patterns: a persistent task rail, a compact workspace header, summary values, trend views, and readable student tables. A restrained blue identity marks navigation and useful actions while white and light neutral surfaces keep records legible.
+TalaTrack is a practical workspace for teachers who need to understand class attendance quickly and follow up with students. It uses familiar school software patterns: a persistent task rail, a compact workspace header, summary values, trend views, and readable student tables. A charcoal canvas and layered dark surfaces keep the workspace calm, while blue marks navigation and useful actions.
 
 The system favors direct labels, compact but comfortable spacing, and status colors paired with letters or text. Data provenance stays clear, with a calm operational visual language that keeps student records in focus.
 
 **Key Characteristics:**
 - Teacher-first navigation and class context
-- Light neutral canvas with blue actions
+- GitHub-inspired charcoal canvas and blue actions
 - Tables as the primary record surface
 - Attendance states pair color with P, A, or L labels
 
 ## Colors
 
-The palette uses blue for actions and analytics highlights, with light neutral surfaces and readable slate text.
+The palette uses blue for actions and analytics highlights, with deep neutral surfaces and bright readable text.
 
 ### Primary
 - **TalaTrack Blue**: Primary navigation and key actions.
@@ -81,12 +81,12 @@ The palette uses blue for actions and analytics highlights, with light neutral s
 - **Attendance Red**: Absence and high-risk indicators.
 
 ### Neutral
-- **Deep Slate**: Headings and primary content.
-- **Soft Deep Slate**: Supporting content.
+- **Pale Slate**: Headings and primary content.
+- **Soft Slate**: Supporting content.
 - **Muted Slate**: Secondary labels.
 - **Fine Divider**: Table and panel boundaries.
-- **White Surface**: Panels and workspace header.
-- **Light Neutral Canvas**: Application background.
+- **Raised Charcoal Surface**: Panels and workspace header.
+- **Near Black Canvas**: Application background.
 
 ## Typography
 
@@ -98,7 +98,7 @@ The desktop shell uses a fixed-width left navigation rail and a fluid content re
 
 ## Elevation & Depth
 
-Depth is mostly tonal: white surfaces sit on a very light neutral canvas and use thin borders. The sticky top bar uses a lightly translucent white fill. Shadows are reserved for the mobile navigation drawer.
+Depth is mostly tonal: raised charcoal surfaces sit on a near-black canvas and use thin borders. The sticky top bar uses a lightly translucent dark fill. Shadows are reserved for the mobile navigation drawer.
 
 ## Shapes
 
@@ -106,7 +106,7 @@ Controls and navigation use gently rounded corners (8px). Panels use a slightly 
 
 ## Components
 
-Primary buttons use blue with white text; secondary buttons use white fill and a fine border. Panels align to a shared padding rhythm. Status marks use P, A, and L letters alongside distinct green, red, and amber fills. Tables use compact uppercase column labels and a soft row hover.
+Primary buttons use blue with white text; secondary buttons use a raised dark fill and a fine border. Panels align to a shared padding rhythm. Status marks use P, A, and L letters alongside distinct green, red, and amber fills. Tables use compact uppercase column labels and a subtle raised row hover.
 
 ## Do's and Don'ts
 

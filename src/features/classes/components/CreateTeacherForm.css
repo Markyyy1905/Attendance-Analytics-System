@@ -5,6 +5,6 @@
 .staff-create-form label small { color:var(--muted); font-size:.74rem; font-weight:400; line-height:1.45; }
 .staff-create-form .button { justify-self:start; align-self:end; min-height:44px; }
 .staff-form-error,.staff-form-success { padding:11px 13px; margin:0 0 14px; border-radius:8px; font-size:.84rem; }
-.staff-form-error { color:#913f3b; background:#fff2f0; border:1px solid #f0d5d1; }
-.staff-form-success { color:#176548; background:#edf8f0; border:1px solid #ccebd4; }
+.staff-form-error { color:#ff7b72; background:var(--danger-pale); border:1px solid #6e3037; }
+.staff-form-success { color:#3fb950; background:var(--surface-soft); border:1px solid #ccebd4; }
 @media(max-width:650px) { .staff-create-form { grid-template-columns:1fr; } .staff-create-form .button { width:100%; } }
