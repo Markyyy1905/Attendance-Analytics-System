@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { AttendanceTrendChart } from "../../../components/charts/AttendanceTrendChart";
 import { AttendanceMark, RiskLabel } from "../../../components/ui/AttendanceMark";
 import { EmptyState, PageHeader, SectionTitle } from "../../../components/ui/PageHeader";
+import { TrendRangeSelect } from "../components/TrendRangeSelect";
 import { NoStudentsState } from "../../../components/ui/NoStudentsState";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { getDateTrend, getDatasetSummary, getStudentMetrics } from "../../../shared/lib/attendanceMetrics";
@@ -72,7 +73,7 @@ export function OverviewPage() {
         <section className="panel overview-trend-panel">
           <div className="panel-heading">
             <div><SectionTitle title="Attendance trend" description="Present and late marks as a share of present, late, and absent marks at each session." /></div>
-            <label className="select-control range-select"><span className="sr-only">Trend date range</span><select value={range} onChange={(event) => setRange(event.target.value)}><option value="all">All dates</option><option value="recent">Most recent 5</option></select></label>
+            <TrendRangeSelect value={range} onChange={setRange} />
           </div>
           <AttendanceTrendChart data={trend} compact />
           <div className="chart-footnote"><span>Excused and blank marks are excluded from the rate denominator.</span><Link to="/analytics">Explore analytics <ArrowRight size={14} /></Link></div>

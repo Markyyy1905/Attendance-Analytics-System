@@ -5,6 +5,7 @@ import { PageHeader } from "../../../components/ui/PageHeader";
 import { NoStudentsState } from "../../../components/ui/NoStudentsState";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { CreateTeacherForm } from "../components/CreateTeacherForm";
+import { StaffMemberSelect } from "../components/StaffMemberSelect";
 import "./StaffPage.css";
 
 export function StaffPage() {
@@ -35,11 +36,7 @@ export function StaffPage() {
     <section className="panel staff-access-panel">
       <div className="staff-access-heading">
         <div><h2>Class assignments</h2><p>Choose a staff member, then grant or remove access to school classes.</p></div>
-        <label className="staff-select-label">Staff member
-          <select value={activeTeacherId} onChange={(event) => void selectTeacher(event.target.value)} disabled={!teachers.length}>
-            {teachers.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.display_name} ({teacher.email})</option>)}
-          </select>
-        </label>
+        <StaffMemberSelect staff={teachers} value={activeTeacherId} onChange={(id) => void selectTeacher(id)} />
       </div>
       {assignmentError && <p className="staff-form-error" role="alert">{assignmentError}</p>}
       <p className="staff-selected-person"><UserRoundCog size={16} /> Access for <strong>{activeTeacher?.display_name || "selected staff member"}</strong></p>

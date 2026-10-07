@@ -5,6 +5,7 @@ import { AttendanceTrendChart } from "../../../components/charts/AttendanceTrend
 import { AttendanceProjectionChart, WeekdayAttendanceChart } from "../../../components/charts/AttendanceInsightCharts";
 import { RiskLabel } from "../../../components/ui/AttendanceMark";
 import { EmptyState, PageHeader } from "../../../components/ui/PageHeader";
+import { AnalyticsFilters } from "../components/AnalyticsFilters";
 import { NoStudentsState } from "../../../components/ui/NoStudentsState";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { getAttendanceForecast, getDateTrend, getDatasetSummary, getStudentMetrics, getWeekdayTrend } from "../../../shared/lib/attendanceMetrics";
@@ -127,11 +128,7 @@ export function AnalyticsPage() {
       {reportError && <p className="analytics-export-error" role="alert">Report was not generated: {reportError}</p>}
       <div className="analytics-scope"><span className="scope-dot" /><span>{dataset.metadata.subjectTitle || "Current class"}</span><i />{dataset.metadata.term || "Current term"}<i />{scopedDataset.dates.length} selected dates</div>
       <section className="panel analytics-trend-panel">
-        <div className="analytics-filters" aria-label="Analytics filters">
-          <label>Class / section<select value={sectionFilter} onChange={(event) => setSectionFilter(event.target.value)}><option value="all">All sections</option>{sections.map((section) => <option value={section} key={section}>{section}</option>)}</select></label>
-          <label>Date range<select value={rangeFilter} onChange={(event) => setRangeFilter(event.target.value)}><option value="all">All dates</option><option value="recent10">Recent 10 sessions</option><option value="recent5">Recent 5 sessions</option></select></label>
-          <label>Student search<input value={studentFilter} onChange={(event) => setStudentFilter(event.target.value)} placeholder="Student name" /></label>
-        </div>
+        <AnalyticsFilters sections={sections} section={sectionFilter} onSectionChange={setSectionFilter} dateRange={rangeFilter} onDateRangeChange={setRangeFilter} student={studentFilter} onStudentChange={setStudentFilter} />
         <div className="panel-heading"><div><h2>Attendance over time</h2><p>(Present + late) / (present + late + absent). Excused and blank marks are excluded.</p></div><span className="panel-tag">{trend.length} sessions</span></div>
         <AttendanceTrendChart data={trend} />
         <div className="analytics-trend-summary"><div><span>Class attended rate</span><strong>{summary.attendanceRate === null ? "—" : `${summary.attendanceRate}%`}</strong></div><div><span>Roster coverage</span><strong>{summary.coveragePercent}%</strong></div><div><span>Highest session</span><strong>{trend.length ? Math.max(...trend.map((point) => point.rate)) : "—"}{trend.length ? "%" : ""}</strong></div><div><span>Latest session</span><strong>{trend.at(-1) ? `${trend.at(-1)!.rate}%` : "—"}</strong></div><div><span>First half vs second half</span><strong>{periodChange === null ? "—" : `${periodChange > 0 ? "+" : ""}${periodChange} pp`}</strong></div></div>

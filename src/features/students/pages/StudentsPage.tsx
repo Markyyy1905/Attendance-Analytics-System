@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { RiskLabel } from "../../../components/ui/AttendanceMark";
 import { PageHeader } from "../../../components/ui/PageHeader";
 import { NoStudentsState } from "../../../components/ui/NoStudentsState";
+import { StudentSectionFilter, StudentStatusFilter } from "../components/StudentFilters";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { getStudentMetrics } from "../../../shared/lib/attendanceMetrics";
 import "./StudentsPage.css";
@@ -29,8 +30,8 @@ export function StudentsPage() {
           <div><h2>Class roster</h2><p>Attendance rate and status for each student.</p></div>
           <div className="students-filters">
             <label className="search-control"><Search size={16} /><span className="sr-only">Search students</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Find a student" /></label>
-            <label className="select-control"><span className="sr-only">Filter students by status</span><select value={filter} onChange={(event) => setFilter(event.target.value)}><option value="all">All students</option><option value="risk">Needs a check-in</option><option value="clear">On track</option></select></label>
-            {dataset.sections.length > 1 && <label className="select-control"><span className="sr-only">Filter students by section</span><select value={sectionFilter} onChange={(event) => setSectionFilter(event.target.value)}><option value="all">All sections</option>{dataset.sections.map((section) => <option key={section} value={section}>{section}</option>)}</select></label>}
+            <StudentStatusFilter value={filter} onChange={setFilter} />
+            {dataset.sections.length > 1 && <StudentSectionFilter sections={dataset.sections} value={sectionFilter} onChange={setSectionFilter} />}
           </div>
         </div>
         {isLoading ? <div className="empty-state"><strong>Loading the class roster</strong><span>Retrieving saved student attendance.</span></div> : dataError && !dataset.students.length ? <div className="empty-state" role="alert"><strong>Roster unavailable</strong><span>{dataError}</span></div> : students.length ? <div className="data-table-wrap"><table className="data-table student-roster"><thead><tr><th>Student</th><th>Attendance</th><th>Present</th><th>Absent</th><th>Late</th><th>Status</th><th /></tr></thead><tbody>

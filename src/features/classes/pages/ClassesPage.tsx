@@ -3,6 +3,7 @@ import { ArrowRight, BookOpen, CalendarDays, FileUp, Search, UsersRound } from "
 import { Link } from "react-router-dom";
 import { PageHeader } from "../../../components/ui/PageHeader";
 import { NoStudentsState } from "../../../components/ui/NoStudentsState";
+import { ClassTermFilter } from "../components/ClassTermFilter";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import "./ClassesPage.css";
 
@@ -35,7 +36,7 @@ export function ClassesPage() {
     {canManageStaff && <div className="teacher-management-row"><div><span>Signed in as</span><strong>{user?.display_name} / {user?.school_name}</strong></div><Link className="button button-secondary" to="/staff">Manage staff and class access <ArrowRight size={15} /></Link></div>}
     <section className="class-workspace-toolbar" aria-label="Filter classes">
       <label className="class-search"><Search size={16} /><span className="sr-only">Search classes</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search subject, code, or section" /></label>
-      <label className="class-term-filter"><span>Term</span><select value={term} onChange={(event) => setTerm(event.target.value)}><option value="all">All terms</option>{terms.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+      <ClassTermFilter terms={terms} value={term} onChange={setTerm} />
       <span className="class-result-count">{classes.filter((item) => item.assigned).length} assigned / {filtered.length} shown</span>
     </section>
 

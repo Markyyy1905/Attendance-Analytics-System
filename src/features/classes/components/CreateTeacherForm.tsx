@@ -1,5 +1,6 @@
 ﻿import { useState, type FormEvent } from "react";
 import { UserPlus } from "lucide-react";
+import { StaffRoleSelect } from "./StaffRoleSelect";
 import "./CreateTeacherForm.css";
 
 export function CreateTeacherForm({ onCreate }: { onCreate: (name: string, email: string, password: string, role: string) => Promise<void> }) {
@@ -32,7 +33,7 @@ export function CreateTeacherForm({ onCreate }: { onCreate: (name: string, email
     <form className="staff-create-form" onSubmit={(event) => void submit(event)}>
       <label>Staff name<input name="name" autoComplete="name" required minLength={2} maxLength={100} /></label>
       <label>Email address<input name="email" type="email" autoComplete="email" required /></label>
-      <label>Role<select name="role"><option value="faculty">Faculty</option><option value="coordinator">Coordinator</option><option value="department_head">Department head</option><option value="administrator">Administrator</option></select></label>
+      <StaffRoleSelect />
       <label>Temporary password<input name="password" type="password" minLength={12} autoComplete="new-password" required /><small>Use at least 12 characters. Share it securely with the staff member.</small></label>
       <button className="button button-primary" type="submit" disabled={saving}><UserPlus size={16} />{saving ? "Creating account..." : "Create staff account"}</button>
     </form>

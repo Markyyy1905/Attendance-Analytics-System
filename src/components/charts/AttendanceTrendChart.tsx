@@ -6,7 +6,7 @@ export function AttendanceTrendChart({ data, compact = false }: { data: ReturnTy
   if (!data.length) return <div className="chart-empty">Add dated attendance records to see a trend.</div>;
 
   const width = 760;
-  const height = compact ? 198 : 250;
+  const height = compact ? 150 : 208;
   const left = 40;
   const right = width - 16;
   const top = 22;

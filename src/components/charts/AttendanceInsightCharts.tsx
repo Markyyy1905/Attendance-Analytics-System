@@ -20,9 +20,9 @@ export function WeekdayAttendanceChart({ data }: { data: WeekdayPoint[] }) {
   const width = 760;
   const left = 112;
   const plotWidth = 550;
-  const top = 18;
-  const rowHeight = 34;
-  const height = top + data.length * rowHeight + 28;
+  const top = 14;
+  const rowHeight = 27;
+  const height = top + data.length * rowHeight + 24;
   const description = data.map((point) => `${point.day}: ${point.rate}% attendance from ${point.denominator} eligible marks across ${point.sessions} sessions; ${point.coverage}% coverage`).join(". ");
 
   return (
@@ -55,7 +55,7 @@ export function AttendanceProjectionChart({ history, forecast }: { history: Retu
   if (observed.length < 6) return null;
 
   const width = 760;
-  const height = 254;
+  const height = 202;
   const left = 42;
   const right = width - 22;
   const top = 20;

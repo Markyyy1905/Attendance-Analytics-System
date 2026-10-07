@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { useAttendanceData } from "../../app/providers/AttendanceDataProvider";
+import { ClassSwitcher } from "./ClassSwitcher";
 import "./AppShell.css";
 
 const workspaceLinks = [
@@ -39,13 +40,7 @@ export function AppShell() {
           <button className="icon-button mobile-close" aria-label="Close navigation" onClick={() => setMenuOpen(false)}><X size={18} /></button>
         </div>
 
-        <div className="workspace-switcher">
-          <div className="workspace-avatar">{dataset.metadata.subjectCode.slice(0, 2) || "CL"}</div>
-          <label className="workspace-copy"><span>Teaching workspace · {assignedClasses.length} assigned</span><select aria-label="Switch active class" value={activeClassId} disabled={!assignedClasses.length || isLoading} onChange={(event) => void selectClass(event.target.value)}>
-            {!assignedClasses.length && <option value="">No classes assigned</option>}
-            {assignedClasses.map((item) => <option key={item.id} value={item.id}>{item.subject} · {item.section} · {item.term}</option>)}
-          </select></label>
-        </div>
+        <ClassSwitcher classes={assignedClasses} workspaceCode={dataset.metadata.subjectCode} activeClassId={activeClassId} isLoading={isLoading} onSelect={(id) => void selectClass(id)} />
 
         <nav className="primary-nav" aria-label="Main navigation">
           <span className="nav-section-label">Workspace</span>

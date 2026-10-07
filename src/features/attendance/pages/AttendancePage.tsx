@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
-import { FileUp, Search, SlidersHorizontal } from "lucide-react";
+import { FileUp, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AttendanceMark, RiskLabel } from "../../../components/ui/AttendanceMark";
 import { PageHeader } from "../../../components/ui/PageHeader";
 import { NoStudentsState } from "../../../components/ui/NoStudentsState";
+import { AttendanceSectionFilter, AttendanceStatusFilter } from "../components/AttendanceFilters";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { getStatusForDate, getStudentMetrics } from "../../../shared/lib/attendanceMetrics";
 import "./AttendancePage.css";
@@ -38,8 +39,8 @@ export function AttendancePage() {
       <section className="panel attendance-table-panel">
         <div className="attendance-controls">
           <label className="search-control"><Search size={16} /><span className="sr-only">Search students</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search students" /></label>
-          <label className="select-control attendance-filter"><SlidersHorizontal size={15} /><span className="sr-only">Filter students</span><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="all">All students</option><option value="risk">Needs a check-in</option><option value="clear">On track</option></select></label>
-          {dataset.sections.length > 1 && <label className="select-control attendance-filter"><span className="sr-only">Filter by section</span><select value={sectionFilter} onChange={(event) => setSectionFilter(event.target.value)}><option value="all">All sections</option>{dataset.sections.map((section) => <option key={section} value={section}>{section}</option>)}</select></label>}
+          <AttendanceStatusFilter value={statusFilter} onChange={setStatusFilter} />
+          {dataset.sections.length > 1 && <AttendanceSectionFilter sections={dataset.sections} value={sectionFilter} onChange={setSectionFilter} />}
           <span className="mark-legend"><span><AttendanceMark status="P" /> Present</span><span><AttendanceMark status="A" /> Absent</span><span><AttendanceMark status="L" /> Late</span></span>
         </div>
         {isLoading ? <div className="empty-state attendance-empty"><strong>Loading attendance</strong><span>Retrieving class sessions and marks.</span></div> : dataError && !dataset.students.length ? <div className="empty-state attendance-empty" role="alert"><strong>Attendance unavailable</strong><span>{dataError}</span></div> : students.length ? <div className="data-table-wrap attendance-matrix-wrap">
