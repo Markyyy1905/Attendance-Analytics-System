@@ -1,0 +1,3 @@
+﻿BEGIN;
+ALTER TABLE students DROP COLUMN IF EXISTS school_student_id;
+COMMIT;

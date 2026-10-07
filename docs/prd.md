@@ -1,19 +1,19 @@
 # Product Requirements Document: Attendwise
 
-**Status:** Draft for school discovery  
-**Product:** Teacher-facing attendance monitoring and analytics system  
-**Current baseline:** React + TypeScript browser prototype with illustrative data and CSV import  
+**Status:** Draft for school discovery
+**Product:** Teacher-facing attendance monitoring and analytics system
+**Current baseline:** React + TypeScript UI, local Node API, PostgreSQL persistence, and CSV import
 **Document owner:** Product / School implementation team
 
 ## 1. Summary
 
 Attendwise helps teachers and authorized school staff maintain reliable attendance records, understand class and student attendance patterns, and follow up with students who may need support. It should turn trusted attendance data into transparent, explainable summaries and timely human review. Analytics and predictions are decision support; staff remain responsible for interpreting context and choosing interventions.
 
-The repository currently demonstrates a useful prototype flow: import CSV, validate and preview it, then inspect a dashboard, attendance matrix, student roster/profile, and descriptive analytics. It is not ready for operational school use. Data exists only in browser memory, there is no authentication or authorization, imports replace the whole active dataset, and the risk formula is explicitly a demo assumption. The next product milestone should be a secure, auditable pilot for one school and its agreed attendance workflow before adding predictive models.
+The repository supports CSV preview and PostgreSQL persistence, then presents dashboard, attendance history, student profiles, descriptive analytics, and a cautious class-level projection. Teachers can manage local teacher profiles, assign classes, switch workspaces, and review each section separately. The interface starts empty when the database has no attendance records. These workspace controls are not authentication: the local API does not verify a signed-in teacher and is not ready for operational school use. Any projection is planning context, not validated forecasting.
 
 ## 2. Problem and opportunity
 
-Teachers need to see whether students are attending, spot changes early, and act on reliable evidence without manually reconciling spreadsheets. Coordinators and administrators need consistent views across classes and terms. Today’s prototype demonstrates the review experience but does not yet provide authoritative records, ongoing updates, collaboration, intervention tracking, or trustworthy predictive analytics.
+Teachers need a persistent, trusted attendance record and clear analytics for spotting changes. Coordinators and administrators need consistent, authorized views across classes and terms. The local implementation now saves CSV imports to PostgreSQL, while production authentication, multi-user authorization, and validated predictions remain future work.
 
 ## 3. Goals and non-goals
 
@@ -55,36 +55,32 @@ Students are the people represented by the records, not direct users of the init
 
 ## 6. Current system review
 
-### Existing strengths to retain
+### Existing capabilities
 
-- Coherent teacher-oriented journey across overview, attendance matrix, roster, profile, analytics, and CSV import.
-- Demo records are isolated behind a repository adapter and clearly described as illustrative.
-- CSV is parsed in the browser, with preview, row-level errors, warnings, and a downloadable template.
-- Views share a common dataset and calculations, and risk flags are presented as prompts for review.
-- The UI pairs attendance status colors with status letters/text and includes responsive layout intent.
+- PostgreSQL is the only attendance data source; the app starts empty when no records exist.
+- Local Node API lists class assignments and loads a selected, assigned class; CSV section blocks are saved as separate classes.
+- CSV preview reports row errors/warnings before commit; import jobs and attendance changes are auditable.
+- Shared calculations drive overview, roster, student profiles, attendance matrix, trends, and the indicative class projection.
+- Attendance trends have an accessible table equivalent and show their denominator.
 
-### Release-blocking gaps for school use
+### Remaining gaps before school use
 
-- No identity, sign-in, session security, school tenancy, or server-side authorization.
-- No durable system of record, backup/recovery, concurrent updates, or multi-user collaboration.
-- No class picker or independent class datasets; an import replaces the active dataset for the entire tab.
-- No authoritative student identifiers. Roster identifiers are synthesized from demo order or CSV row number.
-- No supported attendance-taking/editing workflow, correction reason, approval, or audit history.
-- Formula and policy behavior are provisional: late treatment, excused absences, partial days, enrollment windows, holidays, and threshold boundaries are not configured.
-- Analytics are descriptive only; there is no forecasting, model validation, confidence, or drift monitoring.
-- No generated reports/export, recurring import history, integration, or import reconciliation for existing records.
-- No documented privacy, retention, incident response, accessibility conformance, or production operations plan.
+- No user login, role grants, server-side class authorization, or school tenancy isolation.
+- The API is loopback-only and suitable only for local development.
+- No production backup/recovery, retention/deletion automation, monitoring, or incident response.
+- Import uses a preview followed by atomic upsert, but has no staged conflict-resolution interface or rollback/reprocess workflow.
+- Class assignment UI organizes records by teacher profile, but assignment and teacher-selection requests are not backed by authentication. Add identity verification and strict server authorization before deployment.
+- Attendance-taking/editing, approval workflow, and correction UI are not implemented.
+- Policy and calendar decisions remain provisional; partial-day handling and effective enrollment rules need school approval.
+- The class projection is a transparent baseline and is not a validated forecast.
+- Generated reports, exports, integrations, and follow-up workflows are not implemented.
 
-### Implementation-specific concerns to resolve
+### Implementation-specific concerns
 
-- `getStudentMetrics` treats late as not present for the demo rate and counts absences over all recorded marks. Those choices can materially change school decisions and need a versioned, approved definition.
-- The consecutive-absence calculation follows CSV date order and resets at blank marks. A blank may mean unknown, not a break in an absence streak; the calendar and expected sessions must define this.
-- A date appearing in one section but not another is omitted from the other student's sessions; aggregating present/recorded can produce misleading comparisons when section schedules differ.
-- Slash-form dates are interpreted as month/day/year, which is ambiguous for many locales. Imports need explicit locale/format and strict date validation.
-- The imported dataset is applied wholesale, without duplicate detection, student matching, previewed updates, or rollback.
-- A CSV row number is exposed as a student identifier in the roster; this is not a stable identity and should not be presented as one.
-- Charts expose a summary label but need an equivalent accessible data table and clear handling of no data / one point / incomplete periods.
-
+- Session uniqueness currently uses one class meeting timestamp; schools with multiple meetings on one date must provide distinct meeting times/session identifiers.
+- Blank marks are represented by missing attendance rows and are never inferred absent.
+- Imports require ISO dates and match by normalized name within a class; ambiguous duplicates are blocked. This is less reliable than an authoritative school identifier and should be reviewed during pilot discovery.
+- Class selector and scoped data loading exist for the local workspace; enforce scope against an authenticated user before operational use.
 ## 7. Scope and phased delivery
 
 ### Phase 0: School discovery and policy decisions
@@ -145,7 +141,7 @@ Students are the people represented by the records, not direct users of the init
 
 - Support the agreed source formats (CSV first; XLSX only if operationally needed) with a published template and explicit encoding/date conventions.
 - Stage imports before commit. Report file-level and row-level errors, warnings, matched/unmatched students, duplicate sessions, and proposed changes.
-- Match on a school-approved stable identifier; never use student name or spreadsheet row number as the sole production key.
+- Match imported students by normalized name within the selected class. Reject ambiguous duplicate names; never merge records automatically.
 - Let an authorized user resolve mapping errors, preview impact, commit, and undo/reprocess an import.
 - Preserve original source filename, uploader, upload time, checksum, parser/schema version, row outcomes, and resulting changes.
 - Enforce size/type limits and safe handling of malformed files. Do not expose student data in client logs or error telemetry.
@@ -219,7 +215,7 @@ Students are the people represented by the records, not direct users of the init
 ### Minimum domain records
 
 - School / tenant, academic year, term, calendar, class/subject/section, staff assignment.
-- Student with stable school identifier and effective-dated enrollment/class membership.
+- Student with an internal UUID and effective-dated enrollment/class membership. Imported display names must be unique within the selected class.
 - Class meeting/session with date, timezone, expected roster context, and source.
 - Attendance mark with status, actor, recorded/updated timestamps, correction reason, and source/import reference.
 - Import job, file metadata, row-level result, and audit events.
@@ -252,7 +248,7 @@ These are initial requirements to refine with the school and implementation team
 4. What is the official attendance formula and reporting period? How are enrollment changes and missing sessions treated?
 5. Are the brief's risk thresholds approved? Are they independent triggers, inclusive at boundary, and consistent across grades/programs?
 6. What calendar, timezone, locale, and date formats apply? Which date is the authoritative session date?
-7. What import sources and stable student identifiers exist? How are conflicts, corrections, and duplicates resolved?
+7. What import sources and name-matching rules should apply? How are conflicts, corrections, and duplicates resolved?
 8. Who may see student details, follow-up notes, cohort comparisons, and exports?
 9. What follow-up workflow and terminology are appropriate? Which data must never be recorded in notes?
 10. Which applicable privacy, education-record, retention, and data-residency obligations must the deployment meet?
@@ -282,3 +278,121 @@ Establish a baseline during discovery; set numeric targets with the school befor
 7. Expand descriptive analytics after data quality and operational trust are established.
 8. Evaluate forecasting as a separate evidence-gated capability.
 
+
+## 15. Pilot requirements decisions and specifications
+
+These are concrete single-school pilot defaults. Policy-sensitive values require school owner sign-off before live records are used.
+
+### 15.1 Role permissions
+
+All permissions are enforced server-side and scoped to school and assigned classes. Technical administrators operate infrastructure but receive no student-record access by default.
+
+| Capability | Faculty | Coordinator | Department head | Administrator |
+|---|---|---|---|---|
+| View attendance and student profiles | Assigned classes | Assigned program/classes | Assigned department/classes | School-wide |
+| Take/correct marks | Assigned classes; reason required | Assigned scope; reason required | Assigned scope; reason required | Any class; reason required |
+| Import attendance | Assigned classes | Assigned scope | Assigned scope | Any class |
+| Acknowledge review flags | Assigned classes | Assigned scope | Assigned scope | Any class |
+| View follow-up notes | Permitted assigned students | Assigned scope | Assigned scope | Authorized school scope |
+| Generate reports/export student data | Assigned classes; logged | Assigned scope; logged | Assigned scope; logged | School-wide; logged |
+| Manage policy, accounts, retention | No | No | No | Yes; audited |
+
+### 15.2 Attendance calculation contract (policy version 1 proposal)
+
+A session is one scheduled class meeting on the school calendar. Distinct meetings on a date have distinct session IDs. P=present, L=late, A=unexcused absent, E=excused, blank=unknown/not recorded. Rate is 100 × (P + L) / (P + L + A). Excused and blank are excluded from numerator and denominator; blanks are never inferred absent. Class rate aggregates counts before division. Display percentages round to nearest whole percent, half up; calculation retains full precision. Absence streaks count consecutive expected sessions marked A; P, L, E, or blank breaks the streak. Holidays/non-meetings are not sessions. The current matrix import has one date column per class/date and cannot represent two same-day sessions.
+
+### 15.3 Import file contract
+
+Pilot support is UTF-8 CSV, comma-delimited, optional BOM, maximum 5 MiB, 20,000 student rows, and 200 session columns. XLSX is deferred because the current application only parses CSV.
+
+| Required field | Rule |
+|---|---|
+| Student Name | Non-empty display name, unique within the selected class for safe matching |
+| Class/Section | Must resolve to an authorized class |
+| Grade/Year Level | School-defined text/code |
+| Session columns | ISO 8601 YYYY-MM-DD, unique per class |
+
+Accepted values: P, A, L, E (case-insensitive); blank means unknown. Template:
+
+```csv
+Student Name,Grade/Year Level,2026-09-01,2026-09-03
+Alex Tan,Year 7,P,L
+Sam Lee,Year 7,A,E
+```
+
+Match by normalized name within the selected class. Duplicate names in the file or multiple existing matches block commit. Existing attendance marks for the same student/session are updated atomically and the change is audited. Invalid rows are rejected individually. Missing headers, empty/corrupt files, and size-limit violations block the file. Preview precedes commit. Partial commit is allowed only after rejected rows are shown and an authorized user confirms. Preserve source metadata and row outcomes.
+
+### 15.4 Student identity and duplicate rules
+
+Student fields: immutable UUID PK, display name, grade/year, active state, timestamps. Class membership is effective-dated enrollment. Duplicate names or multiple existing matches are blocked for staff resolution. Never auto-merge. Class movement does not rewrite historical attendance.
+
+### 15.5 At-risk rules
+
+Triggers are OR conditions evaluated over the selected period: rate strictly below 75% (74.99 qualifies, 75.00 does not), at least five consecutive A sessions, or more than eight A sessions (8 does not qualify; 9 qualifies). No denominator means no rate trigger. Thresholds are versioned; grade/program variations require an approved administrator policy. Show trigger, evidence, denominator, sessions, and policy version. A flag prompts human review only. Staff may acknowledge with actor/time/category; acknowledgement does not suppress an active flag. The active flag clears when no trigger remains; its history is retained.
+
+### 15.6 Dashboard and profile
+
+Cards show attendance rate with numerator/denominator, present, absent, late, excused, unrecorded, students monitored, and students flagged. Show selected class, term, date range, source, and freshness. Filters: authorized class/section, term, date range, status, and student-name search. Charts: session trend with denominator, P/A/L/E/blank distribution, and flag counts by reason. Each chart has an equivalent table, formula, and empty state. No records shows an explicit message and no fabricated zero-rate trend. Drill-down opens the corresponding filtered roster; student rows open profiles.
+
+Profiles show name, class/section, grade, effective enrollment, period, rate/denominator, P/A/L/E/blank totals, complete dated history, selected-period trend, active flags/reasons, acknowledgement history, and permitted follow-ups. Record detail shows session, status, source, recorder, and correction history according to role.
+
+### 15.7 Reports and exports
+
+Class report contains school/class/section/grade, term/date range, generation time/timezone, freshness/source, policy/formula, student count, P/A/L/E/blank totals, aggregate rate/denominator, session trend and student roster with names, rates, counts, and review reasons. Individual report contains student name/class/grade/enrollment, period/time, formula/policy, rate/denominator, status totals, full session history, flags, and permitted follow-up status.
+
+Filters include authorized school scope, class, term, date range, status, optional student. Faculty generate assigned-class reports; coordinators and department heads their assigned scope; administrators school-wide. PDF uses the report layout. Excel summary has Summary, Session Trend, and Roster sheets. Analytics CSV contains filtered session facts and metric definitions, excluding restricted notes. Filename: attendwise_<type>_<class-or-student>_<start>_<end>_<generated-UTC>.<ext>, with sanitized identifiers. Empty reports state no data and retain filters/time; empty CSV contains headers. All generation and exports are logged.
+
+### 15.8 Relational database model
+
+PostgreSQL is the chosen pilot database; DATABASE_URL is server-only. Use UUID PKs, school_id tenant scope, UTC timestamps, FK constraints, restrictive deletes, and indexes on school/class/date/student.
+
+| Table | Fields and relationships |
+|---|---|
+| schools | id PK, name, timezone, locale |
+| users | id PK, school_id FK, identity_provider_subject, name, email, active |
+| user_roles | id PK, user_id FK, role, scope_type/id, effective dates |
+| classes | id PK, school_id FK, academic_year, term, class_code, section, grade_level, subject |
+| students | id PK, school_id FK, display_name, grade_level, active |
+| enrollments | id PK, student_id FK, class_id FK, start_date, end_date |
+| sessions | id PK, class_id FK, meeting_at, timezone, source, policy_version; unique(class_id, meeting_at) for pilot |
+| attendance | id PK, session_id FK, student_id FK, status, recorded_by FK, recorded_at, updated_at, correction_reason, import_row_id FK; unique(session_id, student_id) |
+| import_jobs | id PK, school_id FK, class_id FK, uploader_id FK, source_filename, checksum, schema_version, created_at, state |
+| import_rows | id PK, job_id FK, row_number, student_id FK nullable, outcome, errors JSON, proposed_changes JSON |
+| policies | id PK, school_id FK, version, effective_at, configuration JSON, approved_by FK |
+| report_jobs | id PK, school_id FK, requester_id FK, report_type, filters JSON, policy_version, generated_at, format, state, artifact_reference |
+| audit_events | id PK, school_id FK, actor_id FK, action, entity_type/id, before/after JSON, occurred_at, request_id |
+| follow_ups | id PK, student_id FK, class_id FK, owner_id FK, status, category, restricted note, created_at |
+
+School has many users/classes/students/policies/jobs. Class has many enrollments/sessions; student has many enrollments/marks/follow-ups; session has marks; import job has row results. Corrections update current mark transactionally and append prior value to immutable audit history.
+
+### 15.9 Workflow and failure handling
+
+Workflow: Upload → Validate → Process → Calculate → Dashboard → Monitor Students → Detect At-Risk → Generate Report → Export. Validation stages without mutating committed attendance. Blocking file errors show cause/template and preserve current data. Row issues show row, field, and correction steps. Failed transaction rolls back the selected commit and leaves job retryable. Computation failures preserve source records, show a traceable error ID, and do not label stale metrics current. Failed report jobs remain in history with retry guidance; export failure never marks delivery successful. Handle invalid type, missing columns, unknown student/class, invalid value/date, duplicate conflict, empty/corrupt/oversized file, failed calculation, and failed report generation. Do not send personal student information to client telemetry.
+
+### 15.10 Technology and persistence decisions
+
+Frontend: React/TypeScript/Vite. Backend: Node.js HTTP API (native HTTP server); Express and Laravel are not selected. PostgreSQL via server-only DATABASE_URL with ordered SQL migrations. Descriptive analytics use deterministic TypeScript over database-backed sessions. The existing class projection is an indicative linear baseline, not a validated predictive model; do not describe it as a forecast or expose student-level predictions until validation approval. PDF and Excel export libraries are not selected or implemented in the current release.
+
+Committed records and import/report/audit metadata persist in PostgreSQL. School must approve legal retention; proposed pilot default is active enrollment plus two years. Encrypted daily backups, 35-day rolling retention, restore exercise before launch; target RPO <=24 hours and RTO <=1 business day. No production data until identity, policy, privacy, retention, and backup owners are approved.
+
+### 15.11 Authentication and security
+
+Current implementation uses school workspace registration and administrator-provisioned email/password accounts, scrypt password hashes, opaque server-side PostgreSQL sessions, HTTP-only SameSite cookies (Secure in production), origin checks for writes, login throttling, session expiry/revocation, logout, and server-side school/class scope checks. Password reset, email verification, MFA, delegated OIDC/SSO, invitation delivery, and recovery workflows remain production launch requirements. Keep TLS, encrypted backups, secret rotation, and deny-by-default authorization; changing an ID must never cross school or class scope.
+
+
+### 15.12 Release status and remaining launch gates
+
+The current application has PostgreSQL migrations, school signup, account login/logout, administrator-managed staff accounts and class assignments, database-backed attendance/import history, audit records, and descriptive analytics. The production container serves the built React client and API from one origin. Existing records are not replaced by registration or migrations.
+
+This is a deployable pilot foundation, not yet a complete commercial SaaS release. Before accepting live student records or charging schools, configure a production host and managed PostgreSQL service, restrict database credentials, enforce HTTPS and backups, implement email verification/password recovery and optional school SSO, complete privacy/retention and accessibility review, add paid-plan checkout/webhooks and subscription enforcement, and finish validated PDF/XLSX/report workflows. These require school policy decisions and external provider accounts/secrets. No predictive output should be marketed as validated; current analytics are descriptive and the class projection is exploratory.
+### 15.13 Acceptance criteria
+
+- Access: unauthenticated reads fail; every role/API/export is limited to assigned scope; revocation removes access; access changes are audited.
+- Data: every mark has one student and session; duplicate student/session is rejected; blank differs from absent; correction retains previous value, actor, timestamp, and reason.
+- Imports: template works; invalid type/date/ID/status, unknown student, duplicates, empty/corrupt/oversized files match specified behavior; preview equals committed changes; rollback restores prior values.
+- Metrics: school-approved examples reproduce numerator/denominator and half-up display; late is attended, excused excluded, blank marks lower coverage but do not reduce the rate denominator; table equals chart; empty trends do not fabricate 0%; class projection requires six sessions with at least 60% roster coverage and states method/range/cadence.
+- Risk: 74.99/75%, 8/9 absences, 4/5 consecutive absences verify boundaries; reasons are combined; acknowledgement is attributable and never hides active triggers.
+- Views: dashboard filters apply consistently; drill-down retains scope; profile history equals source records; no-data state is explicit.
+- Reports: required fields and filters appear; unauthorized generation is denied; empty behavior and filenames are correct; generation/export is attributable.
+- Operations: imports, corrections, policy, roles, reports, and exports are auditable; verified restore meets RPO/RTO; retention follows approved schedule.
+- Accessibility: keyboard, screen-reader labels, contrast, zoom/reflow, and chart/table equivalence pass on supported viewports.

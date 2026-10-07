@@ -1,4 +1,4 @@
-export type AttendanceCode = "P" | "A" | "L";
+﻿export type AttendanceCode = "P" | "A" | "L" | "E";
 
 export interface AttendanceSession {
   date: string;
@@ -8,8 +8,12 @@ export interface AttendanceSession {
 export interface AttendanceStudent {
   id: string;
   name: string;
+  gradeLevel?: string;
   program: string;
   section: string;
+  subjectTitle?: string;
+  subjectCode?: string;
+  term?: string;
   sessions: AttendanceSession[];
 }
 
@@ -30,6 +34,7 @@ export interface AttendanceDataset {
   students: AttendanceStudent[];
   sourceName: string;
   importedAt: string;
+  expectedRosterByDate?: Record<string, number>;
 }
 
 export interface StudentMetrics {
@@ -37,9 +42,24 @@ export interface StudentMetrics {
   absent: number;
   late: number;
   recorded: number;
-  attendanceRate: number;
+  attendanceRate: number | null;
+  attendanceRateExact: number | null;
+  excused: number;
+  expected: number;
   consecutiveAbsences: number;
   riskReasons: string[];
+  expectedSessions: number;
+  coveragePercent: number;
+  unrecorded: number;
+}
+
+export interface ForecastPoint {
+  date: string;
+  projectedRate: number;
+  lowerBound: number;
+  upperBound: number;
+  sessionsUsed: number;
+  meanCoverage: number;
 }
 
 export interface CsvIssue {

@@ -7,10 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "node --env-file=.env server/migrate.mjs",
+    "db:patch": "node --env-file=.env server/migrate.mjs",
+    "api": "node --env-file=.env server/api.mjs",
+    "start": "node server/api.mjs"
   },
   "dependencies": {
     "lucide-react": "latest",
+    "pg": "^8.23.1",
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "^7.18.4"

@@ -1,4 +1,4 @@
-import { useId } from "react";
+﻿import { useId } from "react";
 import type { ReturnTypeGetDateTrend } from "../../shared/types/chart";
 
 export function AttendanceTrendChart({ data, compact = false }: { data: ReturnTypeGetDateTrend[]; compact?: boolean }) {
@@ -19,18 +19,22 @@ export function AttendanceTrendChart({ data, compact = false }: { data: ReturnTy
 
   return (
     <div className={`trend-chart ${compact ? "trend-chart-compact" : ""}`}>
-      <div className="chart-legend"><span><i /> Present rate</span><small>Rate = present marks ÷ recorded marks</small></div>
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Present rate trend across attendance dates" preserveAspectRatio="none">
+      <div className="chart-legend"><span><i /> Attended rate</span><small>Rate excludes excused/blank; coverage is the share of the expected roster with a mark.</small></div>
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Attended rate trend across attendance dates" preserveAspectRatio="none">
         <defs><linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="var(--chart-fill)" stopOpacity=".22" /><stop offset="100%" stopColor="var(--chart-fill)" stopOpacity="0" /></linearGradient></defs>
         {[0, 25, 50, 75, 100].map((value) => <g key={value}><line x1={left} x2={right} y1={pointY(value)} y2={pointY(value)} className="chart-grid-line" /><text x={left - 10} y={pointY(value) + 4} textAnchor="end" className="chart-axis-label">{value}%</text></g>)}
         <path d={area} fill={`url(#${gradientId})`} />
         <path d={line} fill="none" className="chart-line" vectorEffect="non-scaling-stroke" />
-        {data.map((item, index) => <g key={`${item.date}-${index}`}><circle cx={pointX(index)} cy={pointY(item.rate)} r="4" className="chart-point"><title>{item.date}: {item.rate}% present</title></circle></g>)}
+        {data.map((item, index) => <g key={`${item.date}-${index}`}><circle cx={pointX(index)} cy={pointY(item.rate)} r="4" className="chart-point"><title>{item.date}: {item.rate}% attended; {item.recorded} eligible marks; {item.coveragePercent}% roster coverage</title></circle></g>)}
         {labels.map((item) => {
           const index = data.indexOf(item);
           return <text key={`${item.date}-${index}`} x={pointX(index)} y={height - 9} textAnchor="middle" className="chart-axis-label">{new Intl.DateTimeFormat("en", { month: "short", day: "numeric", timeZone: "UTC" }).format(new Date(`${item.date}T00:00:00Z`))}</text>;
-        })}
+      })}
       </svg>
+      <details className="chart-data-details">
+        <summary>View trend data table</summary>
+        <div className="data-table-wrap"><table className="data-table"><caption className="sr-only">Attendance session trend data</caption><thead><tr><th>Session date</th><th>Attendance rate</th><th>Present</th><th>Absent</th><th>Late</th><th>Eligible marks</th><th>Coverage</th><th>Unrecorded</th></tr></thead><tbody>{data.map((item) => <tr key={item.date}><td>{item.date}</td><td>{item.rate}%</td><td>{item.present}</td><td>{item.absent}</td><td>{item.late}</td><td>{item.recorded}</td><td>{item.coveragePercent}%</td><td>{item.unrecorded}</td></tr>)}</tbody></table></div>
+      </details>
     </div>
   );
 }

@@ -29,11 +29,11 @@ export function ImportPage() {
     setFileName(file.name);
     setFileSize(file.size);
     if (!file.name.toLowerCase().endsWith(".csv")) {
-      setFileError("This prototype reads CSV files. Choose a .csv file to continue.");
+      setFileError("Only CSV files are supported. Choose a .csv file to continue.");
       return;
     }
     if (file.size > maxFileBytes) {
-      setFileError("This file is larger than the 5 MB prototype limit. Choose a smaller CSV file.");
+      setFileError("This file is larger than the 5 MB limit. Choose a smaller CSV file.");
       return;
     }
     setBusy(true);
@@ -56,8 +56,8 @@ export function ImportPage() {
       ["Term", "First Semester", "2026-27"],
       ["Course/Section", "PROGRAM", "SECTION"],
       [],
-      ["Student", "7/24/2026", "7/30/2026", "8/6/2026"],
-      ["SAMPLE STUDENT", "P", "A", "L"],
+      ["Student Name", "Grade/Year Level", "2026-07-24", "2026-07-30", "2026-08-06"],
+      ["Sample Student", "Year 7", "P", "A", "L"],
     ].map((row) => row.map((cell) => `"${cell.replaceAll('"', '""')}"`).join(",")).join("\r\n");
     const blob = new Blob([`\uFEFF${contents}`], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -68,9 +68,17 @@ export function ImportPage() {
     URL.revokeObjectURL(url);
   }
 
-  function applyImport(dataset: AttendanceDataset) {
-    replaceDataset(dataset);
-    setApplied(true);
+  async function applyImport(dataset: AttendanceDataset) {
+    setBusy(true);
+    setFileError("");
+    try {
+      await replaceDataset(dataset);
+      setApplied(true);
+    } catch (error) {
+      setFileError(error instanceof Error ? error.message : "Attendance data could not be saved.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   const parsedDataset = result?.dataset;
@@ -83,14 +91,14 @@ export function ImportPage() {
       {applied ? <section className="import-success-panel">
         <div className="success-check"><Check size={23} /></div>
         <h2>Attendance data is ready</h2>
-        <p><strong>{fileName}</strong> is now active in this browser tab. Dashboard, attendance records, student profiles, and analytics use the imported class data.</p>
-        <div className="success-summary"><span>{summary?.students ?? parsedDataset?.students.length} student records</span><i /> <span>{parsedDataset?.dates.length} attendance dates</span><i /> <span>Session only</span></div>
+        <p><strong>{fileName}</strong> has been saved to the attendance database. Dashboard, attendance records, student profiles, and analytics use the committed data.</p>
+        <div className="success-summary"><span>{summary?.students ?? parsedDataset?.students.length} student records</span><i /> <span>{parsedDataset?.dates.length} attendance dates</span><i /> <span>Saved to database</span></div>
         <div className="success-actions"><Link className="button button-primary" to="/dashboard">View dashboard <ArrowRight size={15} /></Link><button className="button button-secondary" onClick={() => { setApplied(false); setResult(null); setFileName(""); if (inputRef.current) inputRef.current.value = ""; }}><RotateCcw size={14} /> Import another file</button></div>
       </section> : <>
         <div className="import-flow-steps" aria-label="Import steps">
           <div className="import-step import-step-current"><span>1</span><div><strong>Choose file</strong><small>Select a CSV</small></div></div><i />
           <div className={`import-step ${result ? "import-step-current" : ""}`}><span>{result?.dataset ? <Check size={15} /> : "2"}</span><div><strong>Review data</strong><small>Check the preview</small></div></div><i />
-          <div className={`import-step ${applied ? "import-step-current" : ""}`}><span>3</span><div><strong>Apply to demo</strong><small>Update this session</small></div></div>
+          <div className={`import-step ${applied ? "import-step-current" : ""}`}><span>3</span><div><strong>Save to PostgreSQL</strong><small>Commit attendance records</small></div></div>
         </div>
 
         <section className="panel import-upload-panel">
@@ -103,7 +111,7 @@ export function ImportPage() {
           {busy && <div className="import-loading"><span className="loading-spinner" /> Reading and checking CSV…</div>}
           {fileError && <div className="import-error" role="alert"><AlertCircle size={17} /><span>{fileError}</span><button aria-label="Dismiss error" onClick={() => setFileError("")}><X size={15} /></button></div>}
           {fileName && !fileError && <div className="selected-file"><span className="selected-file-icon"><FileSpreadsheet size={17} /></span><div><strong>{fileName}</strong><span>{(fileSize / 1024).toFixed(1)} KB · {result ? "Checked" : "Ready to read"}</span></div>{result && (result.errors.length ? <span className="file-state file-state-error"><AlertCircle size={14} /> Needs review</span> : <span className="file-state file-state-success"><CheckCircle2 size={14} /> Valid CSV</span>)}</div>}
-          <div className="format-help"><strong>Use the provided attendance format</strong><span>Metadata rows first, then a row with <code>Student</code> and one dated column per class. Marks can be P, A, L, or blank.</span></div>
+          <div className="format-help"><strong>Use the provided attendance format</strong><span>Metadata rows first, then Student Name, Grade/Year Level, and ISO date columns. Marks: P, A, L, E, or blank.</span></div>
         </section>
 
         {result && <section className="panel import-validation-panel">
@@ -112,12 +120,14 @@ export function ImportPage() {
           {result.warnings.length > 0 && <div className="validation-list validation-list-warnings">{result.warnings.map((issue, index) => <div key={`${issue.row}-${index}`}><AlertCircle size={15} /><span><strong>Row {issue.row}:</strong> {issue.message}</span></div>)}</div>}
           {parsedDataset && summary && <>
             <div className="import-preview-meta"><div><span>Subject</span><strong>{parsedDataset.metadata.subjectTitle || "Not supplied"}</strong></div><div><span>Code / sections</span><strong>{[parsedDataset.metadata.subjectCode, parsedDataset.sections.join(", ")].filter(Boolean).join(" · ") || "Not supplied"}</strong></div><div><span>Term</span><strong>{parsedDataset.metadata.term || "Not supplied"}</strong></div></div>
-            <div className="import-preview-summary"><div><strong>{parsedDataset.sections.length}</strong><span>sections</span></div><div><strong>{summary.students}</strong><span>student rows</span></div><div><strong>{summary.sessions}</strong><span>dates across sections</span></div><div><strong>{summary.attendanceRate}%</strong><span>present rate*</span></div><div><strong>{summary.atRisk}</strong><span>students flagged</span></div></div>
-            <div className="import-preview-table-wrap"><table className="data-table import-preview-table"><thead><tr><th>Student</th><th>Section</th>{parsedDataset.dates.slice(0, 4).map((date) => <th key={date}>{date}</th>)}{parsedDataset.dates.length > 4 && <th>…</th>}<th>Rate</th><th>Flag</th></tr></thead><tbody>{parsedDataset.students.slice(0, 6).map((student) => { const metrics = getStudentMetrics(student); return <tr key={student.id}><td>{student.name}</td><td>{student.section}</td>{parsedDataset.dates.slice(0, 4).map((date) => { const status = getStatusForDate(student, date); return <td key={`${student.id}-${date}`}><span className={`preview-mark preview-mark-${status.toLowerCase()}`}>{status || "—"}</span></td>; })}{parsedDataset.dates.length > 4 && <td>…</td>}<td>{metrics.attendanceRate}%</td><td>{metrics.riskReasons.length ? <span className="preview-risk">Review</span> : <span className="preview-clear">On track</span>}</td></tr>; })}</tbody></table></div>
-            <div className="import-preview-footer"><span>* Demo formula: P marks ÷ all recorded marks. Imported data replaces the current class data until this tab is refreshed.</span><button className="button button-primary" onClick={() => applyImport(parsedDataset)}>Apply dataset to this session <ArrowRight size={15} /></button></div>
+            <div className="import-preview-summary"><div><strong>{parsedDataset.sections.length}</strong><span>sections</span></div><div><strong>{summary.students}</strong><span>student rows</span></div><div><strong>{summary.sessions}</strong><span>dates across sections</span></div><div><strong>{summary.attendanceRate === null ? "—" : `${summary.attendanceRate}%`}</strong><span>attended rate*</span></div><div><strong>{summary.atRisk}</strong><span>students flagged</span></div></div>
+            <div className="import-preview-table-wrap"><table className="data-table import-preview-table"><thead><tr><th>Student</th><th>Section</th>{parsedDataset.dates.slice(0, 4).map((date) => <th key={date}>{date}</th>)}{parsedDataset.dates.length > 4 && <th>…</th>}<th>Rate</th><th>Flag</th></tr></thead><tbody>{parsedDataset.students.slice(0, 6).map((student) => { const metrics = getStudentMetrics(student); return <tr key={student.id}><td>{student.name}</td><td>{student.section}</td>{parsedDataset.dates.slice(0, 4).map((date) => { const status = getStatusForDate(student, date); return <td key={`${student.id}-${date}`}><span className={`preview-mark preview-mark-${status.toLowerCase()}`}>{status || "—"}</span></td>; })}{parsedDataset.dates.length > 4 && <td>…</td>}<td>{metrics.attendanceRate === null ? "—" : `${metrics.attendanceRate}%`}</td><td>{metrics.riskReasons.length ? <span className="preview-risk">Review</span> : <span className="preview-clear">On track</span>}</td></tr>; })}</tbody></table></div>
+            <div className="import-preview-footer"><span>* Rate = (present + late) / (present + late + absent); excused and blank are excluded.</span><button className="button button-primary" disabled={busy} onClick={() => void applyImport(parsedDataset)}>{busy ? "Saving..." : "Save attendance data"} <ArrowRight size={15} /></button></div>
           </>}
         </section>}
       </>}
     </main>
   );
 }
+
+

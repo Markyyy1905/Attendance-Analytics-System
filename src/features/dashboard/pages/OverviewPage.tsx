@@ -3,7 +3,7 @@ import { ArrowDownToLine, ArrowRight, BookOpen, CalendarDays, CheckCircle2, Circ
 import { Link } from "react-router-dom";
 import { AttendanceTrendChart } from "../../../components/charts/AttendanceTrendChart";
 import { AttendanceMark, RiskLabel } from "../../../components/ui/AttendanceMark";
-import { PageHeader, SectionTitle } from "../../../components/ui/PageHeader";
+import { EmptyState, PageHeader, SectionTitle } from "../../../components/ui/PageHeader";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { getDateTrend, getDatasetSummary, getStudentMetrics } from "../../../shared/lib/attendanceMetrics";
 import "./OverviewPage.css";
@@ -13,7 +13,7 @@ function initials(name: string) {
 }
 
 export function OverviewPage() {
-  const { dataset } = useAttendanceData();
+  const { dataset, isLoading, dataError } = useAttendanceData();
   const [range, setRange] = useState("all");
   const summary = getDatasetSummary(dataset);
   const trend = useMemo(() => {
@@ -23,12 +23,21 @@ export function OverviewPage() {
   const studentsAtRisk = dataset.students
     .map((student) => ({ student, metrics: getStudentMetrics(student) }))
     .filter(({ metrics }) => metrics.riskReasons.length > 0)
-    .sort((a, b) => a.metrics.attendanceRate - b.metrics.attendanceRate);
+    .sort((a, b) => (a.metrics.attendanceRateExact ?? 101) - (b.metrics.attendanceRateExact ?? 101));
 
   const latestDate = dataset.dates.at(-1);
   const formattedLatestDate = latestDate
     ? new Intl.DateTimeFormat("en", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }).format(new Date(`${latestDate}T00:00:00Z`))
     : "No dates recorded";
+
+  if (!dataset.students.length) {
+    return <main className="page-overview">
+      <PageHeader title="Attendance overview" description="Attendance summaries appear after records are saved to PostgreSQL." actions={<Link className="button button-primary" to="/import"><FileUp size={16} /> Upload attendance</Link>} />
+      <section className="panel">
+        <EmptyState title={isLoading ? "Loading attendance data" : dataError ? "Database connection unavailable" : "No attendance data saved"} description={isLoading ? "Connecting to PostgreSQL." : dataError || "Upload a valid class CSV with student names to add attendance records to PostgreSQL."} />
+      </section>
+    </main>;
+  }
 
   return (
     <main className="page-overview">
@@ -51,7 +60,8 @@ export function OverviewPage() {
       </div>
 
       <section className="overview-metrics" aria-label="Class attendance summary">
-        <div className="overview-metric"><span><CalendarDays size={15} /> Attendance rate</span><strong>{summary.attendanceRate}<small>%</small></strong><em>Present ÷ recorded marks</em></div>
+        <div className="overview-metric"><span><CalendarDays size={15} /> Attendance rate</span><strong>{summary.attendanceRate ?? "—"}{summary.attendanceRate !== null && <small>%</small>}</strong><em>{summary.attendanceRate === null ? "No eligible attendance marks yet" : "(Present + late) ÷ (present + late + absent)"}</em></div>
+        <div className="overview-metric"><span><CalendarDays size={15} /> Roster coverage</span><strong>{summary.coveragePercent}<small>%</small></strong><em>Expected student sessions with a mark</em></div>
         <div className="overview-metric"><span><UsersRound size={15} /> Students monitored</span><strong>{summary.students}</strong><em>In the loaded dataset</em></div>
         <div className="overview-metric"><span><CheckCircle2 size={15} /> Present marks</span><strong>{summary.present.toLocaleString()}</strong><em>Across {summary.sessions} recorded dates</em></div>
         <div className={`overview-metric ${summary.atRisk ? "overview-metric-risk" : ""}`}><span><CircleAlert size={15} /> Needs a check-in</span><strong>{summary.atRisk}</strong><em>Based on the brief’s risk rules</em></div>
@@ -60,20 +70,20 @@ export function OverviewPage() {
       <div className="overview-grid">
         <section className="panel overview-trend-panel">
           <div className="panel-heading">
-            <div><SectionTitle title="Attendance trend" description="Present marks as a share of all recorded marks at each class date." /></div>
+            <div><SectionTitle title="Attendance trend" description="Present and late marks as a share of present, late, and absent marks at each session." /></div>
             <label className="select-control range-select"><span className="sr-only">Trend date range</span><select value={range} onChange={(event) => setRange(event.target.value)}><option value="all">All dates</option><option value="recent">Most recent 5</option></select></label>
           </div>
           <AttendanceTrendChart data={trend} compact />
-          <div className="chart-footnote"><span>Attendance percentage uses the demo formula. Late is counted separately.</span><Link to="/analytics">Explore analytics <ArrowRight size={14} /></Link></div>
+          <div className="chart-footnote"><span>Excused and blank marks are excluded from the rate denominator.</span><Link to="/analytics">Explore analytics <ArrowRight size={14} /></Link></div>
         </section>
 
         <section className="panel class-panel">
           <div className="panel-heading"><SectionTitle title="Class snapshot" description="A quick read of recorded attendance." /></div>
-          <div className="class-rate"><strong>{summary.attendanceRate}<span>%</span></strong><span>present across class sessions</span></div>
-          <div className="class-rate-meter" role="meter" aria-label="Class attendance rate" aria-valuemin={0} aria-valuemax={100} aria-valuenow={summary.attendanceRate}>
+          <div className="class-rate"><strong>{summary.attendanceRate ?? "—"}{summary.attendanceRate !== null && <span>%</span>}</strong><span>{summary.attendanceRate === null ? "No eligible marks recorded" : "present across eligible class marks"}</span></div>
+          {summary.attendanceRate !== null && <div className="class-rate-meter" role="meter" aria-label="Class attendance rate" aria-valuemin={0} aria-valuemax={100} aria-valuenow={summary.attendanceRate}>
             <div className="class-rate-track"><span style={{ width: `${Math.min(summary.attendanceRate, 100)}%` }} /><i /></div>
             <div><span>0%</span><strong>75% review threshold</strong><span>100%</span></div>
-          </div>
+          </div>}
           <div className="class-status-list">
             <div><span><i className="status-dot status-dot-present" />Present</span><strong>{summary.present}</strong></div>
             <div><span><i className="status-dot status-dot-absent" />Absent</span><strong>{summary.absent}</strong></div>
@@ -93,7 +103,7 @@ export function OverviewPage() {
             <tbody>{studentsAtRisk.slice(0, 5).map(({ student, metrics }) => (
               <tr key={student.id}>
                 <td><div className="student-name-cell"><span className="student-avatar">{initials(student.name)}</span><span className="student-name-copy"><strong>{student.name}</strong><span>{student.program} · {student.section}</span></span></div></td>
-                <td className={metrics.attendanceRate < 75 ? "rate-low" : ""}>{metrics.attendanceRate}%</td>
+                <td className={metrics.attendanceRateExact !== null && metrics.attendanceRateExact < 75 ? "rate-low" : ""}>{metrics.attendanceRate === null ? "—" : `${metrics.attendanceRate}%`}</td>
                 <td>{metrics.present}</td><td>{metrics.absent}</td><td>{metrics.late}</td><td><RiskLabel reasons={metrics.riskReasons} /></td>
                 <td><Link className="table-link" to={`/students/${student.id}`}>Review</Link></td>
               </tr>
@@ -105,9 +115,10 @@ export function OverviewPage() {
       </section>
 
       <section className="overview-bottom-row">
-        <div className="source-note"><span className="source-icon"><FileUp size={16} /></span><div><strong>Current data source</strong><span>{dataset.sourceName} · {dataset.students.length} student records</span></div><Link to="/import"><ArrowDownToLine size={15} /> Replace data</Link></div>
+        <div className="source-note"><span className="source-icon"><FileUp size={16} /></span><div><strong>Current data source</strong><span>{dataset.sourceName} · {dataset.students.length} student records</span></div><Link to="/import"><ArrowDownToLine size={15} /> Add or update attendance</Link></div>
         <p className="risk-rule-note">Flags are based on attendance below 75%, five consecutive absences, or more than eight absences.</p>
       </section>
     </main>
   );
 }
+

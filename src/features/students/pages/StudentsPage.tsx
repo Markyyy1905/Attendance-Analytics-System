@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import { Search, UserRoundSearch } from "lucide-react";
 import { Link } from "react-router-dom";
 import { RiskLabel } from "../../../components/ui/AttendanceMark";
@@ -10,7 +10,7 @@ import "./StudentsPage.css";
 function initials(name: string) { return name.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase(); }
 
 export function StudentsPage() {
-  const { dataset } = useAttendanceData();
+  const { dataset, isLoading, dataError } = useAttendanceData();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [sectionFilter, setSectionFilter] = useState("all");
@@ -32,11 +32,12 @@ export function StudentsPage() {
             {dataset.sections.length > 1 && <label className="select-control"><span className="sr-only">Filter students by section</span><select value={sectionFilter} onChange={(event) => setSectionFilter(event.target.value)}><option value="all">All sections</option>{dataset.sections.map((section) => <option key={section} value={section}>{section}</option>)}</select></label>}
           </div>
         </div>
-        {students.length ? <div className="data-table-wrap"><table className="data-table student-roster"><thead><tr><th>Student</th><th>Student ID</th><th>Attendance</th><th>Present</th><th>Absent</th><th>Late</th><th>Status</th><th /></tr></thead><tbody>
-          {students.map(({ student, metrics }, index) => <tr key={student.id}><td><div className="student-name-cell"><span className={`student-avatar student-avatar-${index % 5}`}>{initials(student.name)}</span><span className="student-name-copy"><strong>{student.name}</strong><span>{student.program} · {student.section}</span></span></div></td><td className="student-id">{student.id.startsWith("demo") ? `ST-${String(index + 1042).padStart(5, "0")}` : `CSV row ${student.id.split("-")[1]}`}</td><td className={metrics.attendanceRate < 75 ? "rate-low" : "roster-rate"}>{metrics.attendanceRate}%</td><td>{metrics.present}</td><td>{metrics.absent}</td><td>{metrics.late}</td><td><RiskLabel reasons={metrics.riskReasons} /></td><td><Link className="table-link" to={`/students/${student.id}`}>View profile</Link></td></tr>)}
-        </tbody></table></div> : <div className="empty-state"><UserRoundSearch size={23} /><strong>No students found</strong><span>Try a different name or clear the status filter.</span></div>}
+        {isLoading ? <div className="empty-state"><strong>Loading the class roster</strong><span>Retrieving saved student attendance.</span></div> : dataError && !dataset.students.length ? <div className="empty-state" role="alert"><strong>Roster unavailable</strong><span>{dataError}</span></div> : students.length ? <div className="data-table-wrap"><table className="data-table student-roster"><thead><tr><th>Student</th><th>Attendance</th><th>Present</th><th>Absent</th><th>Late</th><th>Status</th><th /></tr></thead><tbody>
+          {students.map(({ student, metrics }, index) => <tr key={student.id}><td><div className="student-name-cell"><span className={`student-avatar student-avatar-${index % 5}`}>{initials(student.name)}</span><span className="student-name-copy"><strong>{student.name}</strong><span>{student.program} Â· {student.section}</span></span></div></td><td className={metrics.attendanceRate !== null && metrics.attendanceRate < 75 ? "rate-low" : "roster-rate"}>{metrics.attendanceRate === null ? "—" : `${metrics.attendanceRate}%`}</td><td>{metrics.present}</td><td>{metrics.absent}</td><td>{metrics.late}</td><td><RiskLabel reasons={metrics.riskReasons} /></td><td><Link className="table-link" to={`/students/${student.id}`}>View profile</Link></td></tr>)}
+        </tbody></table></div> : <div className="empty-state"><UserRoundSearch size={23} /><strong>{dataset.students.length ? "No students match these filters" : "No students in the selected class"}</strong><span>{dataset.students.length ? "Try another name or review-status filter." : "Select or assign a class in My classes, or import a class attendance file."}</span></div>}
       </section>
       <div className="students-threshold-note">A student is flagged when attendance is below 75%, there are five consecutive absences, or total absences exceed eight.</div>
     </main>
   );
 }
+

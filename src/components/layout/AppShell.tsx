@@ -4,12 +4,11 @@ import {
   Activity,
   BarChart3,
   BookOpenCheck,
-  ChevronDown,
+  Layers3,
   FileSpreadsheet,
   GraduationCap,
   LayoutDashboard,
   Menu,
-  RotateCcw,
   UsersRound,
   X,
 } from "lucide-react";
@@ -18,6 +17,7 @@ import "./AppShell.css";
 
 const workspaceLinks = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard },
+  { to: "/classes", label: "My classes", icon: Layers3 },
   { to: "/attendance", label: "Attendance", icon: BookOpenCheck },
   { to: "/students", label: "Students", icon: UsersRound },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
@@ -25,7 +25,9 @@ const workspaceLinks = [
 
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { dataset, isDemo, resetDemo } = useAttendanceData();
+  const { dataset, classes, activeClassId, selectClass, isLoading, dataError, user, signOut } = useAttendanceData();
+  const assignedClasses = classes.filter((item) => item.assigned);
+
 
   return (
     <div className="app-frame">
@@ -39,8 +41,10 @@ export function AppShell() {
 
         <div className="workspace-switcher">
           <div className="workspace-avatar">{dataset.metadata.subjectCode.slice(0, 2) || "CL"}</div>
-          <div className="workspace-copy"><span>Teaching workspace</span><strong>{dataset.sections.length > 1 ? "All sections" : dataset.metadata.section || "All classes"}</strong></div>
-          <ChevronDown size={15} />
+          <label className="workspace-copy"><span>Teaching workspace · {assignedClasses.length} assigned</span><select aria-label="Switch active class" value={activeClassId} disabled={!assignedClasses.length || isLoading} onChange={(event) => void selectClass(event.target.value)}>
+            {!assignedClasses.length && <option value="">No classes assigned</option>}
+            {assignedClasses.map((item) => <option key={item.id} value={item.id}>{item.subject} · {item.section} · {item.term}</option>)}
+          </select></label>
         </div>
 
         <nav className="primary-nav" aria-label="Main navigation">
@@ -57,19 +61,18 @@ export function AppShell() {
         </nav>
 
         <div className="sidebar-foot">
-          <div className="data-status"><span className="status-indicator" /><div><strong>{isDemo ? "Demo dataset" : "Imported for this session"}</strong><span>{dataset.students.length} students · {dataset.dates.length} dates</span></div></div>
-          {!isDemo && <button className="reset-demo-button" onClick={resetDemo}><RotateCcw size={14} /> Reset to demo data</button>}
-          <div className="sidebar-foot-note"><Activity size={15} /><span>Prototype · data stays in this tab</span></div>
+          <div className="data-status"><span className="status-indicator" /><div><strong>{dataError ? "Database unavailable" : isLoading ? "Loading PostgreSQL" : dataset.students.length ? "Saved attendance data" : "No attendance data"}</strong><span>{dataset.students.length} students · {dataset.dates.length} dates · {assignedClasses.length} assigned classes</span></div></div>
+          <div className="sidebar-foot-note"><Activity size={15} /><span>Attendance records persist in PostgreSQL</span></div>
         </div>
       </aside>
 
       <div className="app-main">
         <header className="topbar">
           <button className="icon-button mobile-menu" aria-label="Open navigation" onClick={() => setMenuOpen(true)}><Menu size={20} /></button>
-          <div className="breadcrumb"><span>Workspace</span><span className="breadcrumb-separator">/</span><strong>{dataset.metadata.term || "Attendance overview"}</strong></div>
+          <div className="breadcrumb"><span>Workspace</span><span className="breadcrumb-separator">/</span><strong>{dataset.metadata.section ? `${dataset.metadata.section} · ${dataset.metadata.term}` : "Attendance overview"}</strong></div>
           <div className="topbar-tools">
-            <span className="prototype-badge"><span /> Prototype data</span>
-            <div className="teacher-profile"><div className="teacher-avatar">JM</div><div><strong>Jamie Morgan</strong><span>Teacher</span></div><ChevronDown size={15} /></div>
+            <span className="prototype-badge"><span />{dataError ? " Database offline" : isLoading ? " Connecting…" : " PostgreSQL"}</span>
+            <div className="teacher-profile"><div className="teacher-avatar">{user?.display_name.split(/\s+/).slice(0,2).map((part)=>part[0]).join("").toUpperCase()||"U"}</div><div><strong>{user?.display_name}</strong><span>{user?.school_name} · {user?.roles.join(", ")}</span></div><button className="button button-secondary" onClick={()=>void signOut()}>Sign out</button></div>
           </div>
         </header>
         <div className="main-content"><Outlet /></div>

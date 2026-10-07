@@ -1,30 +1,27 @@
-﻿# Architecture
+# Architecture
 
-The prototype uses a feature-oriented React + TypeScript structure. Each feature owns its pages and page styles. Reusable layout, charts, and interface primitives sit in `components`; attendance types and calculations sit in `shared`.
-
-## Boundaries
-
-- `app/` owns routes and the session-level attendance data provider.
-- `features/<feature>/pages/` owns route-level views and adjacent CSS files.
-- `features/import/services/` parses uploaded attendance files into the domain model.
-- `shared/types/` defines the types passed between screens and services.
-- `shared/lib/` holds calculations used by more than one view.
-- `services/attendance/` owns the repository seam. The current repository adapter returns illustrative mock records.
-- `mocks/` is the one location for default fictional attendance records.
-- `components/` holds shared layout, chart, and UI elements.
+Attendwise has a React + TypeScript + Vite client, a small Node.js API for local development, and PostgreSQL persistence through `pg`.
 
 ## Data flow
 
 ```text
-Page → AttendanceDataProvider → AttendanceRepository → demo fixture
-  ↑              ↑
-  └── shared calculations
-
-CSV file → CSV parser → validated AttendanceDataset → provider replacement → all pages
+CSV ? browser parser and preview ? local API ? PostgreSQL transaction
+                                      ?
+Teacher assignment ? class selector ? isolated class dataset
+                                      ?
+shared attendance metrics, coverage-aware trends, review evidence, cautious class projection
 ```
 
-The provider holds data in React state only. Imported rows are not saved to local storage or sent to a service. Reloading restores the mock repository. The importer is an input adapter; it does not contain dashboard or risk calculations.
+The API binds to `127.0.0.1:4174`; Vite proxies `/api`. `DATABASE_URL` is loaded by server scripts and never bundled into the client. Imports match students by normalized name within a class and save import jobs, row outcomes, sessions, marks, teacher/class assignments, and audit entries transactionally. CSV sections are split into separate class records. Student UUIDs are internal database keys, not displayed or required in CSV. The client stores the selected teacher and class locally and loads only the selected class dataset.
 
-## Replaceable data source
+## Current boundary
 
-`AttendanceRepository` is the future integration boundary. Replace `mockAttendanceRepository` with an API-backed implementation while returning the same `AttendanceDataset` contract. Keep CSV parsing and page components independent from HTTP details.
+This backend is for local development. Teacher workspaces and assignments are modeled and used for local navigation, but teacher selection is not authentication; requests are not protected by a verified login identity. Do not expose it to a network or use for live school data. Staged import conflict review, rollback, follow-up workflows, reports/exports, and production backup/retention operations remain before a school pilot.
+
+## Source structure
+
+- `server/`: local API and migration runner.
+- `database/migrations/`: PostgreSQL schema.
+- `src/app/`: routes and app-level data provider.
+- `src/features/`: dashboard, class and teacher workspace, attendance, import, roster/profile, and analytics UI.
+- `src/shared/lib/`: shared metric and projection calculations.

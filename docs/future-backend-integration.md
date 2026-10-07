@@ -1,14 +1,14 @@
-﻿# Future backend integration
+# Backend status
 
-The prototype is browser-only. Before using actual student data, add a server boundary and replace the repository adapter while preserving the `AttendanceDataset` contract.
+Attendwise now has a local Node API, a PostgreSQL schema migration, and a persistence path for CSV imports matched by student name within class. The API listens only on loopback and should be used only for local development. Do not expose it to school networks or load live student records yet.
 
-1. Add a typed API client in `src/services/attendance/` using an environment-configured base URL.
-2. Move file validation and persistence to a server endpoint if uploaded files must be centrally stored.
-3. Add authentication and server-side authorization for teachers, coordinators, department heads, and administrators.
-4. Derive class and student access on the server; client-side navigation is not an authorization boundary.
-5. Store import jobs and row-level validation outcomes so users can audit corrections and reprocess data.
-6. Define the official attendance-rate formula, timezone/date interpretation, and risk policy with the institution.
-7. Add server-backed reports only after export formats and privacy requirements are agreed.
-8. Remove demonstration fixtures and session-only import behavior after the live data path is ready.
+## Required before a school pilot
 
-The attached document lists Excel upload and PDF/Excel exports as intended capabilities. They are not implemented in this CSV demonstration.
+1. Add school OIDC login/logout and server-side authorization for faculty, coordinators, department heads, and administrators.
+2. Restrict every read, correction, import, and export to validated staff class assignments and school tenancy.
+3. Add staged import conflict resolution, rollback/reprocessing, and duplicate reconciliation.
+4. Approve the calendar, attendance formula, thresholds, retention period, and timezone with the school.
+5. Add restricted follow-up notes, flag acknowledgement history, class/student reports, and logged exports.
+6. Implement encrypted backups, restore drills, monitoring, incident handling, and deletion/retention automation.
+
+The current local import service is not a production authorization boundary. The `DATABASE_URL` value is server-only and must never be prefixed with `VITE_` or shipped to browsers.

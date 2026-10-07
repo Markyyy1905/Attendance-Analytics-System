@@ -7,7 +7,7 @@
 .context-detail { display: grid; gap: 4px; min-width: 120px; }
 .context-detail span { color: #8a968e; font-size: .67rem; }
 .context-detail strong { color: #4b5d52; font-size: .76rem; font-weight: 600; }
-.overview-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 22px; padding: 0 4px; }
+.overview-metrics { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-bottom: 22px; padding: 0 4px; }
 .overview-metric { min-height: 99px; display: grid; align-content: start; gap: 5px; padding: 3px 21px 4px; border-right: 1px solid var(--line-strong); }
 .overview-metric:first-child { padding-left: 8px; }
 .overview-metric:last-child { border-right: 0; }
@@ -77,3 +77,4 @@
   .overview-bottom-row { flex-direction: column; }
   .risk-rule-note { text-align: left; }
 }
+

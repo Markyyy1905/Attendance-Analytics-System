@@ -1,40 +1,29 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
-import { mockAttendanceRepository } from "../../services/attendance/attendanceRepository";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { AttendanceDataset } from "../../shared/types/attendance";
-
-interface AttendanceDataContextValue {
-  dataset: AttendanceDataset;
-  isDemo: boolean;
-  replaceDataset: (nextDataset: AttendanceDataset) => void;
-  resetDemo: () => void;
+export interface TeachingClass { id:string; subject:string; class_code:string; section:string; grade_level:string; term:string; source_filename:string|null; uploaded_at:string|null; student_count:number; session_count:number; assigned:boolean }
+export interface TeacherAccount { id:string; display_name:string; email:string }
+export interface AppUser { id:string; school_id:string; display_name:string; email:string; school_name:string; roles:string[] }
+const emptyDataset=():AttendanceDataset=>({metadata:{subjectTitle:"",subjectCode:"",term:"",program:"",section:"",scheduleDays:[],scheduleTimes:[]},sections:[],dates:[],students:[],sourceName:"PostgreSQL",importedAt:""});
+interface Ctx { user:AppUser|null; authenticated:boolean; authReady:boolean; signIn:(email:string,password:string)=>Promise<void>; signUp:(data:{name:string;school:string;email:string;password:string})=>Promise<void>; signOut:()=>Promise<void>; dataset:AttendanceDataset; classes:TeachingClass[]; teachers:TeacherAccount[]; activeClassId:string; activeTeacherId:string; selectClass:(id:string)=>Promise<void>; selectTeacher:(id:string)=>Promise<void>; createTeacher:(name:string,email:string,password:string,role:string)=>Promise<void>; assignClass:(classId:string,assigned:boolean)=>Promise<void>; isLoading:boolean; dataError:string; replaceDataset:(data:AttendanceDataset)=>Promise<void>; refreshClasses:()=>Promise<TeachingClass[]> }
+const Context=createContext<Ctx|null>(null);
+async function api(path:string,init?:RequestInit){const r=await fetch(path,{...init,credentials:"same-origin",cache:"no-store",headers:{...(init?.body?{"content-type":"application/json"}:{}),...init?.headers}});const b=await r.json();if(!r.ok)throw new Error(b.error||"The request failed.");return b;}
+export function AttendanceDataProvider({children}:{children:ReactNode}){
+ const [user,setUser]=useState<AppUser|null>(null),[authReady,setAuthReady]=useState(false);const [dataset,setDataset]=useState(emptyDataset),[classes,setClasses]=useState<TeachingClass[]>([]),[teachers,setTeachers]=useState<TeacherAccount[]>([]),[activeClassId,setActiveClassId]=useState(""),[activeTeacherId,setActiveTeacherId]=useState(""),[isLoading,setLoading]=useState(true),[dataError,setDataError]=useState("");
+ const getClasses=useCallback(async(target=activeTeacherId||user?.id||"")=>{const b=await api(`/api/classes?teacherId=${encodeURIComponent(target)}`);setClasses(b.classes||[]);return b.classes||[];},[activeTeacherId,user?.id]);
+ const loadClass=useCallback(async(classId:string)=>{if(!classId){setDataset(emptyDataset());setActiveClassId("");return;}setDataError("");setLoading(true);try{const b=await api(`/api/dataset?classId=${encodeURIComponent(classId)}`);if(!b.dataset)throw new Error("This class has no saved attendance yet.");setDataset(b.dataset);setActiveClassId(classId);localStorage.setItem("attendwise.activeClassId",classId);}catch(e){setDataError(e instanceof Error?e.message:"Could not load class.");}finally{setLoading(false);}},[]);
+ const selectClass=useCallback(async(id:string)=>{if(id!==activeClassId)await loadClass(id);},[activeClassId,loadClass]);
+ const selectTeacher=useCallback(async(id:string)=>{setActiveTeacherId(id);setLoading(true);setDataset(emptyDataset());setActiveClassId("");try{const xs=await getClasses(id);const saved=localStorage.getItem("attendwise.activeClassId");const chosen=xs.find((x:TeachingClass)=>x.id===saved&&x.assigned)||xs.find((x:TeachingClass)=>x.assigned);if(chosen)await loadClass(chosen.id);else setLoading(false);}catch(e){setDataError(e instanceof Error?e.message:"Could not load workspace.");setLoading(false);}},[getClasses,loadClass]);
+ const refreshClasses=useCallback(()=>getClasses(),[getClasses]);
+ const refreshTeachers=useCallback(async()=>{if(!(user?.roles.includes("administrator")||user?.roles.includes("technical_administrator")))return;try{const b=await api("/api/teachers");setTeachers(b.teachers||[]);}catch{}},[user]);
+ const signIn=useCallback(async(email:string,password:string)=>{const b=await api("/api/auth/login",{method:"POST",body:JSON.stringify({email,password})});setUser(b.user);setActiveTeacherId(b.user.id);},[]);
+ const signUp=useCallback(async(data:{name:string;school:string;email:string;password:string})=>{const b=await api("/api/auth/register",{method:"POST",body:JSON.stringify(data)});setUser(b.user);setActiveTeacherId(b.user.id);},[]);
+ const signOut=useCallback(async()=>{try{await api("/api/auth/logout",{method:"POST",body:"{}"});}finally{setUser(null);setTeachers([]);setClasses([]);setDataset(emptyDataset());setActiveClassId("");setActiveTeacherId("");}},[]);
+ const createTeacher=useCallback(async(displayName:string,email:string,password:string,role:string)=>{const b=await api("/api/teachers",{method:"POST",body:JSON.stringify({displayName,email,password,role})});await refreshTeachers();await selectTeacher(b.teacher.id);},[refreshTeachers,selectTeacher]);
+ const assignClass=useCallback(async(classId:string,assigned:boolean)=>{await api("/api/class-assignments",{method:"POST",body:JSON.stringify({classId,teacherId:activeTeacherId,assigned})});const xs=await getClasses(activeTeacherId);if(assigned&&activeClassId!==classId)await loadClass(classId);else if(!assigned&&activeClassId===classId){const next=xs.find((x:TeachingClass)=>x.assigned);await loadClass(next?.id||"");}},[activeTeacherId,activeClassId,getClasses,loadClass]);
+ useEffect(()=>{let live=true;(async()=>{try{const b=await api("/api/auth/me");if(!live)return;setUser(b.user);setActiveTeacherId(b.user.id);}catch{if(live)setUser(null);}finally{if(live)setAuthReady(true);}})();return()=>{live=false;}},[]);
+ useEffect(()=>{if(!authReady||!user)return;let live=true;(async()=>{setLoading(true);try{await refreshTeachers();const xs=await getClasses(activeTeacherId||user.id);if(!live)return;const saved=localStorage.getItem("attendwise.activeClassId");const chosen=xs.find((x:TeachingClass)=>x.id===saved&&x.assigned)||xs.find((x:TeachingClass)=>x.assigned);if(chosen){const b=await api(`/api/dataset?classId=${encodeURIComponent(chosen.id)}`);if(live){setDataset(b.dataset||emptyDataset());setActiveClassId(chosen.id);}}else{setDataset(emptyDataset());setActiveClassId("");}}catch(e){if(live)setDataError(e instanceof Error?e.message:"Cannot connect to PostgreSQL.");}finally{if(live)setLoading(false);}})();return()=>{live=false;}},[authReady,user?.id,activeTeacherId]);
+ const replaceDataset=useCallback(async(next:AttendanceDataset)=>{const b=await api("/api/import",{method:"POST",body:JSON.stringify(next)});const xs=await getClasses(activeTeacherId);const chosen=xs.find((x:TeachingClass)=>x.id===b.classIds?.[0]&&x.assigned)||xs.find((x:TeachingClass)=>x.assigned);if(chosen)await loadClass(chosen.id);},[getClasses,activeTeacherId,loadClass]);
+ const value=useMemo<Ctx>(()=>({user,authenticated:!!user,authReady,signIn,signUp,signOut,dataset,classes,teachers,activeClassId,activeTeacherId,selectClass,selectTeacher,createTeacher,assignClass,isLoading,dataError,replaceDataset,refreshClasses}),[user,authReady,signIn,signUp,signOut,dataset,classes,teachers,activeClassId,activeTeacherId,selectClass,selectTeacher,createTeacher,assignClass,isLoading,dataError,replaceDataset,refreshClasses]);
+ return <Context.Provider value={value}>{children}</Context.Provider>;
 }
-
-const AttendanceDataContext = createContext<AttendanceDataContextValue | null>(null);
-
-export function AttendanceDataProvider({ children }: { children: ReactNode }) {
-  const [dataset, setDataset] = useState<AttendanceDataset>(() => mockAttendanceRepository.loadInitialDataset());
-  const [isDemo, setIsDemo] = useState(true);
-  const value = useMemo(
-    () => ({
-      dataset,
-      isDemo,
-      replaceDataset: (nextDataset: AttendanceDataset) => {
-        setDataset(nextDataset);
-        setIsDemo(false);
-      },
-      resetDemo: () => {
-        setDataset(mockAttendanceRepository.loadInitialDataset());
-        setIsDemo(true);
-      },
-    }),
-    [dataset, isDemo],
-  );
-
-  return <AttendanceDataContext.Provider value={value}>{children}</AttendanceDataContext.Provider>;
-}
-
-export function useAttendanceData() {
-  const context = useContext(AttendanceDataContext);
-  if (!context) throw new Error("useAttendanceData must be used inside AttendanceDataProvider");
-  return context;
-}
+export function useAttendanceData(){const value=useContext(Context);if(!value)throw new Error("useAttendanceData must be used inside AttendanceDataProvider");return value;}

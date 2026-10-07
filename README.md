@@ -1,60 +1,28 @@
-﻿# Attendwise · Attendance Analytics Prototype
+# Attendwise
 
-A fresh, presentation-ready attendance analytics prototype for teachers. It shows how a class CSV is checked, reviewed, and used across an attendance dashboard, class register, student profiles, and analytics.
+Attendwise is a multi-school attendance workspace built with React, TypeScript, Node.js, and PostgreSQL. School accounts, classes, enrollments, attendance, imports, sessions, and audit history persist in PostgreSQL. Browser storage is used only for non-sensitive UI preferences.
 
-All default figures are illustrative. CSV imports stay in browser memory for the current tab and replace the demo dataset until refresh. No student records are sent to a server.
+## Run locally
 
-## Start the app
+1. Copy `.env.example` to `.env` and set `DATABASE_URL` for a PostgreSQL database you control.
+2. Install dependencies with `npm ci`.
+3. Apply versioned schema migrations with `npm run db:migrate`. The runner applies pending SQL migrations without printing connection details.
+4. Run `npm run api` in one terminal and `npm run dev` in another. The Vite development server proxies `/api` to port 4174.
+5. Open the app and create the initial school workspace. Registration creates its administrator account. Use a unique email and a password with at least 12 characters.
 
-```bash
-npm install
-npm run dev
-```
+The application never seeds illustrative student records. The first school administrator can add staff accounts, assign classes, and import the provided attendance CSV template. Account sessions are opaque, server-side PostgreSQL records with HTTP-only cookies. Set `APP_ORIGINS` to the exact allowed site origins. Production requires HTTPS so session cookies use the `Secure` attribute.
 
-Open the local address printed by Vite. The stack is React, TypeScript, and Vite.
+## Deploy in a container
 
-## Main flow
+The included Dockerfile builds the frontend and serves it and the API from one Node process. Provide `DATABASE_URL`, `APP_ORIGINS` (your HTTPS origin), `NODE_ENV=production`, and `PGSSL=require` when required by your PostgreSQL provider. Run `npm run db:migrate` as a deployment release step before switching traffic, then start the container with `npm start`. Persist database backups outside the application container and test restore procedures. Use a managed PostgreSQL service with TLS, automated encrypted backups, monitoring, and a least-privilege database role.
 
-1. Open **Import attendance** and select a `.csv` file.
-2. The browser checks the metadata, dated columns, student rows, and attendance marks.
-3. Review the validation messages and record preview.
-4. Apply a valid dataset to the current session.
-5. Review the updated class overview, attendance matrix, student profiles, and analytics.
+The container exposes port 4174. The database migration command must be run with the same database configuration as the application. Keep `.env` and all provider secrets out of source control and client-side `VITE_*` variables.
 
-Use **Reset to demo data** in the sidebar to restore the illustrative class. Refreshing the page also starts from demo data.
+## Product functions
 
-## CSV shape
+- School signup and secure login/logout, administrator-managed staff accounts, session expiry, login throttling, and server-side school/class authorization.
+- Separate class/section workspaces, class assignment management, CSV import reconciliation, student attendance history, and audit events.
+- PostgreSQL-backed descriptive rates, coverage, trends, at-risk review signals, and the existing cautious class-level projection. Projections are decision support and are not validated individual predictions.
+- Attendance formula: `(present + late) / (present + late + absent)`. Excused and unrecorded marks are excluded from the rate denominator; coverage is displayed separately.
 
-The parser supports the supplied metadata rows followed by a header row beginning with `Student`. A file can contain multiple class blocks, each with its own metadata, dates, and student rows. Section-specific dates are combined in overview and analytics; filter the attendance matrix or roster by section to review one group at a time. Student rows use `P` (present), `A` (absent), `L` (late), or a blank cell. The column count is dynamic, so the file can grow as more dates are added. Use **Download template** on the import page to get a starter CSV.
-
-The attached brief does not define the attendance percentage formula. This demo uses present marks divided by all recorded marks, with late marks shown separately. Confirm the institution’s formula before connecting live records.
-
-## Project structure
-
-```text
-src/
-  app/                          routes and app-level data provider
-  components/                   shared layout, charts, and UI primitives
-  features/
-    analytics/pages/             analytics screen and its page styles
-    attendance/pages/            attendance screen and its page styles
-    dashboard/pages/             overview screen and its page styles
-    import/pages/                import flow and its page styles
-    import/services/              CSV parser
-    students/pages/               roster and student profile screens
-  mocks/                         removable demonstration records
-  services/attendance/            repository seam for a future API
-  shared/lib/                     attendance calculations
-  shared/styles/                  design tokens and global styles
-  shared/types/                   domain types
-```
-
-Each page and its CSS live beside each other. Parsing and calculations stay in feature or shared service modules; page components handle presentation and interaction.
-
-## Reference documents
-
-- [System flow](docs/system-flow.md)
-- [Architecture](docs/architecture.md)
-- [CSV format and validation](docs/csv-template.md)
-- [Mock data and replacement](docs/mock-data.md)
-- [Future backend integration](docs/future-backend-integration.md)
+See [the PRD](docs/prd.md), [CSV specification](docs/csv-template.md), [system workflow](docs/system-flow.md), and [architecture](docs/architecture.md) for product definitions and constraints.

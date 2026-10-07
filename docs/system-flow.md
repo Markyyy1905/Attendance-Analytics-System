@@ -1,45 +1,17 @@
-﻿# System flow
-
-## Teacher journey
+# System flow
 
 ```text
-Open class overview
-       ↓
-Import attendance CSV
-       ↓
-Parse and validate in browser
-       ↓
-Review file summary and student sample
-       ↓
-Apply dataset to this tab
-       ↓
-See updated attendance, analytics, and student flags
-       ↓
-Review a student profile and attendance history
+Upload ? Validate ? Preview ? Split by class/section ? Commit to PostgreSQL ? Select teacher workspace/class ? Calculate ? Dashboard ? Monitor students ? Detect review flags ? Analyze trends / class projection
 ```
 
-## Import steps
+1. Staff selects the provided CSV template and uploads a file.
+2. The browser checks file type and size, headers, ISO dates, duplicate student names, and attendance values.
+3. It shows row-level errors and warnings with an attendance preview. Invalid files cannot be committed.
+4. Staff commits the valid preview. The local API separates each section block, then writes import metadata, student, class assignment, session, attendance, and audit records in one PostgreSQL transaction.
+5. If the transaction fails, PostgreSQL rolls back the commit and the UI reports that the data was not saved.
+6. The teacher workspace shows class assignments. Selecting a class loads only that class's PostgreSQL records; refresh reloads the selected records. There is no mock-data fallback.
+7. Rate is (P + L) / (P + L + A); excused and blank are excluded from its denominator. Coverage counts known statuses separately so missing records remain visible. Review flags explain the evidence for each OR condition. Trends include eligible denominators, coverage, and weekday summaries. A recency-weighted class projection is shown only with at least six sessions and 60% roster coverage, with a 90% planning interval; it is not a validated prediction.
 
-1. The teacher selects or drops a CSV file (maximum 5 MB).
-2. The importer reads the file in the browser. Nothing is uploaded to a server.
-3. The parser reads each class's metadata rows and `Student` date header, combining as many section blocks, date columns, and student rows as the file contains.
-4. The validator accepts `P`, `A`, `L`, and blank marks. It reports malformed marks and rows with no records before the teacher applies the data.
-5. The preview shows course details, record counts, calculated rate, risk flags, and sample rows.
-6. The teacher applies a valid file. The active dataset updates for the current tab.
-7. Overview, Attendance, Students, and Analytics recalculate from the same dataset.
+An empty database shows an explicit empty state and prompts staff to import attendance. If the API or database is unreachable, the UI reports the connection failure and does not substitute sample records.
 
-The teacher can reset to the illustrative dataset from the sidebar. Refreshing also loads demo data again.
-
-## Attendance review
-
-- **Overview** summarizes the selected class, attendance rate, student count, and flags. It links to the roster, trend detail, and file import.
-- **Attendance** shows students as rows and dated marks as columns. The matrix can be searched and filtered by review status.
-- **Students** provides a class roster and individual profile links.
-- **Student profile** shows summary counts, rate, dated marks, and the reason for any flag.
-- **Analytics** presents date trends and present, absent, and late totals.
-
-## Risk review
-
-The attached project brief says to flag attendance below 75%, five consecutive absences, or more than eight total absences. A flag prompts a teacher to review the student; it does not make an intervention decision for them.
-
-The brief leaves the rate formula blank. For the demo, the rate is `P marks ÷ all nonblank marks`, and `L` marks are displayed as a separate total. Confirm the institutional formula and risk policy before connecting live records.
+The API is restricted to loopback for local development. Teacher/class assignment currently organizes local workspaces but does not authenticate the selected teacher. Identity, enforceable authorization, production hosting, and privacy operations are required before using school records outside local development.
