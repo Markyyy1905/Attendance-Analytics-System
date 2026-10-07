@@ -1,19 +1,19 @@
 # Product Requirements Document: TalaTrack
 
-**Status:** Draft for school discovery
+**Status:** Working pilot baseline; school policy and production gates remain open
 **Product:** Teacher-facing attendance monitoring and analytics system
-**Current baseline:** React + TypeScript UI, local Node API, PostgreSQL persistence, and CSV import
+**Current baseline:** React + TypeScript + Vite, Node.js API, PostgreSQL persistence, account login, and CSV import
 **Document owner:** Product / School implementation team
 
 ## 1. Summary
 
 TalaTrack helps teachers and authorized school staff maintain reliable attendance records, understand class and student attendance patterns, and follow up with students who may need support. It should turn trusted attendance data into transparent, explainable summaries and timely human review. Analytics and predictions are decision support; staff remain responsible for interpreting context and choosing interventions.
 
-The repository supports CSV preview and PostgreSQL persistence, then presents dashboard, attendance history, student profiles, descriptive analytics, and a cautious class-level projection. Teachers can manage local teacher profiles, assign classes, switch workspaces, and review each section separately. The interface starts empty when the database has no attendance records. These workspace controls are not authentication: the local API does not verify a signed-in teacher and is not ready for operational school use. Any projection is planning context, not validated forecasting.
+The application supports school workspace registration, staff sign-in, assigned class workspaces, CSV preview and PostgreSQL persistence, dashboard and student history, descriptive analytics, and an exploratory class-level projection. It starts empty when no attendance records exist. The system is a pilot foundation, not yet a school-approved production service; matching by name, policy configuration, privacy operations, recovery, and other launch gates remain. The projection is planning context, not a validated forecast.
 
 ## 2. Problem and opportunity
 
-Teachers need a persistent, trusted attendance record and clear analytics for spotting changes. Coordinators and administrators need consistent, authorized views across classes and terms. The local implementation now saves CSV imports to PostgreSQL, while production authentication, multi-user authorization, and validated predictions remain future work.
+The study focuses on collecting and organizing attendance records for 4th-year Computer Science students at Lyceum of Alabang, then presenting patterns and trends that help authorized staff monitor attendance more efficiently. TalaTrack persists imported records and enforces school/class access; approved attendance policy, authoritative student matching, and validated predictions remain future work.
 
 ## 3. Goals and non-goals
 
@@ -57,30 +57,31 @@ Students are the people represented by the records, not direct users of the init
 
 ### Existing capabilities
 
+- The app has school workspace registration, email/password sign-in and sign-out, PostgreSQL sessions, administrator-provisioned staff accounts, and server-side school/class access checks.
 - PostgreSQL is the only attendance data source; the app starts empty when no records exist.
-- Local Node API lists class assignments and loads a selected, assigned class; CSV section blocks are saved as separate classes.
-- CSV preview reports row errors/warnings before commit; import jobs and attendance changes are auditable.
-- Shared calculations drive overview, roster, student profiles, attendance matrix, trends, and the indicative class projection.
-- Attendance trends have an accessible table equivalent and show their denominator.
+- The shared Node API is used by Vite locally and a Vercel function in deployment. CSV section blocks are saved as separate classes.
+- CSV preview reports row errors/warnings before a transaction commits; import jobs and attendance changes are auditable.
+- Shared calculations drive the overview, roster, student profiles, attendance matrix, session and weekday analytics, review flags, and the indicative class projection.
+- Session trends and projections have visible data-table details; denominator, coverage, formula, and projection limitations are presented.
+- Class analytics can be exported as CSV; report requests and exports are recorded in PostgreSQL.
 
 ### Remaining gaps before school use
 
-- No user login, role grants, server-side class authorization, or school tenancy isolation.
-- The API is loopback-only and suitable only for local development.
-- No production backup/recovery, retention/deletion automation, monitoring, or incident response.
-- Import uses a preview followed by atomic upsert, but has no staged conflict-resolution interface or rollback/reprocess workflow.
-- Class assignment UI organizes records by teacher profile, but assignment and teacher-selection requests are not backed by authentication. Add identity verification and strict server authorization before deployment.
+- The API has local email/password accounts, but email verification, password recovery, MFA, and school SSO are not implemented.
+- Production backup/recovery, retention/deletion automation, monitoring, and incident response are not configured or demonstrated.
+- Imports preview before an atomic upsert, but do not stage conflicts for resolution or support rollback/reprocessing UI.
 - Attendance-taking/editing, approval workflow, and correction UI are not implemented.
 - Policy and calendar decisions remain provisional; partial-day handling and effective enrollment rules need school approval.
-- The class projection is a transparent baseline and is not a validated forecast.
-- Generated reports, exports, integrations, and follow-up workflows are not implemented.
+- Student matching uses normalized names within a class rather than an approved stable school identifier.
+- The class projection is an exploratory baseline and is not a validated forecast.
+- PDF/XLSX reports, external integrations, follow-up workflows, and paid subscription controls are not implemented.
 
 ### Implementation-specific concerns
 
 - Session uniqueness currently uses one class meeting timestamp; schools with multiple meetings on one date must provide distinct meeting times/session identifiers.
 - Blank marks are represented by missing attendance rows and are never inferred absent.
 - Imports require ISO dates and match by normalized name within a class; ambiguous duplicates are blocked. This is less reliable than an authoritative school identifier and should be reviewed during pilot discovery.
-- Class selector and scoped data loading exist for the local workspace; enforce scope against an authenticated user before operational use.
+- The class selector and data API enforce current school and class grants; access policies still need school role review before operational use.
 ## 7. Scope and phased delivery
 
 ### Phase 0: School discovery and policy decisions
@@ -382,7 +383,7 @@ Current implementation uses school workspace registration and administrator-prov
 
 ### 15.12 Release status and remaining launch gates
 
-The current application has PostgreSQL migrations, school signup, account login/logout, administrator-managed staff accounts and class assignments, database-backed attendance/import history, audit records, and descriptive analytics. The production container serves the built React client and API from one origin. Existing records are not replaced by registration or migrations.
+The current application has PostgreSQL migrations, school signup, account login/logout, administrator-managed staff accounts and class assignments, database-backed attendance/import history, audit records, and descriptive analytics. Vercel serves the built React client and API function from one deployment origin. Existing records are not replaced by registration or migrations.
 
 This is a deployable pilot foundation, not yet a complete commercial SaaS release. Before accepting live student records or charging schools, configure a production host and managed PostgreSQL service, restrict database credentials, enforce HTTPS and backups, implement email verification/password recovery and optional school SSO, complete privacy/retention and accessibility review, add paid-plan checkout/webhooks and subscription enforcement, and finish validated PDF/XLSX/report workflows. These require school policy decisions and external provider accounts/secrets. No predictive output should be marketed as validated; current analytics are descriptive and the class projection is exploratory.
 ### 15.13 Acceptance criteria
