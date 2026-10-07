@@ -2,9 +2,9 @@
 
 The interface is a staff-facing attendance analytics workspace for desktop review, with a responsive layout for smaller screens.
 
-- **Canvas:** light neutral grey; content surfaces stay white with subtle borders.
+- **Canvas:** near-black charcoal; raised dark surfaces use subtle borders to separate work areas.
 - **Primary color:** TalaTrack blue for navigation, primary actions, links, focus, and trend highlights.
-- **Status colors:** green for present, red for absent, amber for late. Status letters and accessible labels accompany color.
+- **Status colors:** bright green for present, coral red for absent, amber for late. Status letters and accessible labels accompany color.
 - **Type:** DM Sans for interface text and Manrope for headings and measured values.
 - **Shape:** 8-14px control and panel corners, thin dividers, restrained shadows.
 - **Data tables:** tabular numerals, sticky student column for wide attendance matrices, horizontal overflow on small screens.

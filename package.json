@@ -9,9 +9,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "db:migrate": "node --env-file=.env server/migrate.mjs",
-    "db:patch": "node --env-file=.env server/migrate.mjs",
-    "api": "node --env-file=.env server/api.mjs",
-    "start": "node server/api.mjs"
+    "api": "node --env-file=.env server/api.mjs"
   },
   "dependencies": {
     "lucide-react": "latest",
