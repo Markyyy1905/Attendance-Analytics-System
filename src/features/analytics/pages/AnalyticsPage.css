@@ -88,3 +88,25 @@
  .trigger-row { grid-template-columns:minmax(130px,1fr) minmax(50px,1fr) 20px; gap:7px; font-size:.7rem; }
  .projection-legend { gap:10px; margin-left:34px; font-size:.7rem; }
 }
+
+/* Compact chart canvases keep the analytics workspace dense and scannable. */
+.analytics-trend-panel { padding:18px; }
+.analytics-trend-panel .panel-heading { margin-bottom:10px; }
+.analytics-trend-panel .trend-chart svg { height:136px; }
+.analytics-trend-panel .weekday-chart svg { height:142px; }
+.analytics-trend-panel .projection-chart svg { height:146px; }
+.analytics-primary-grid .trend-chart svg { height:136px; }
+.analytics-insight-panel .weekday-chart svg { height:142px; }
+.analytics-insight-panel .projection-chart svg { height:146px; }
+.analytics-insight-panel .chart-data-details { margin-top:6px; }
+.status-breakdown-list { gap:11px; padding-bottom:10px; }
+
+@media(max-width:760px) {
+ .analytics-trend-panel { padding:16px; }
+ .analytics-trend-panel .trend-chart svg { height:128px; }
+ .analytics-trend-panel .weekday-chart svg,
+ .analytics-trend-panel .projection-chart svg { height:136px; }
+ .analytics-primary-grid .trend-chart svg { height:128px; }
+ .analytics-insight-panel .weekday-chart svg,
+ .analytics-insight-panel .projection-chart svg { height:136px; }
+}
