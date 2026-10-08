@@ -9,10 +9,20 @@ import { StaffMemberSelect } from "../components/StaffMemberSelect";
 import "./StaffPage.css";
 
 export function StaffPage() {
-  const { refreshTeachers, user, teachers, managementClasses: classes, activeTeacherId, selectTeacher, createTeacher, assignClass, isLoading, dataError } = useAttendanceData();
+  const { refreshTeachers, approveTeacherRequest, pendingTeacherRequests, user, teachers, managementClasses: classes, activeTeacherId, selectTeacher, createTeacher, assignClass, isLoading, dataError } = useAttendanceData();
   useEffect(() => { if (activeTeacherId) void selectTeacher(activeTeacherId); }, [activeTeacherId, selectTeacher]);
-  useEffect(() => { void refreshTeachers(); }, [refreshTeachers]);
+  useEffect(() => {
+    const refreshWhenVisible = () => { if (document.visibilityState === "visible") void refreshTeachers(); };
+    refreshWhenVisible();
+    const interval = window.setInterval(refreshWhenVisible, 30_000);
+    window.addEventListener("focus", refreshWhenVisible);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refreshWhenVisible);
+    };
+  }, [refreshTeachers]);
   const [savingClassId, setSavingClassId] = useState("");
+  const [approvingRequestId, setApprovingRequestId] = useState("");
   const [assignmentError, setAssignmentError] = useState("");
   const isAdministrator = user?.school_roles.includes("administrator") || user?.school_roles.includes("technical_administrator");
 
@@ -30,11 +40,27 @@ export function StaffPage() {
     }
   }
 
+  async function approveRequest(requestId: string) {
+    setApprovingRequestId(requestId);
+    setAssignmentError("");
+    try {
+      await approveTeacherRequest(requestId);
+    } catch (cause) {
+      setAssignmentError(cause instanceof Error ? cause.message : "Could not approve the staff request.");
+    } finally {
+      setApprovingRequestId("");
+    }
+  }
+
   const activeTeacher = teachers.find((teacher) => teacher.id === activeTeacherId);
 
   return <main className="page-staff">
     <PageHeader title="Staff and class access" description="Create staff accounts and assign the classes each person can review." />
     <CreateTeacherForm onCreate={createTeacher} />
+    {pendingTeacherRequests.length > 0 && <section className="panel staff-access-panel">
+      <div className="staff-access-heading"><div><h2>Staff requests</h2><p>Accounts registered using this school name appear here. Approve a request to add the account to the staff list.</p></div></div>
+      <div className="staff-table-wrap"><table className="staff-table"><thead><tr><th>Name</th><th>Email</th><th>Requested</th><th /></tr></thead><tbody>{pendingTeacherRequests.map((request) => <tr key={request.id}><td><strong>{request.display_name}</strong></td><td>{request.email}</td><td>{new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(new Date(request.created_at))}</td><td><button className="button button-primary staff-assignment-button" type="button" disabled={approvingRequestId === request.id} onClick={() => void approveRequest(request.id)}>{approvingRequestId === request.id ? "Approving..." : "Approve account"}</button></td></tr>)}</tbody></table></div>
+    </section>}
     <section className="panel staff-access-panel">
       <div className="staff-access-heading">
         <div><h2>Class assignments</h2><p>All active staff in this school are listed. Create staff here to add them to this school.</p></div>
