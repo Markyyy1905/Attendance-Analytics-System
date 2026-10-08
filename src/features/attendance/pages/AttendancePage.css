@@ -2,7 +2,7 @@
 .attendance-summary-line > div { display: grid; gap: 4px; }
 .attendance-summary-line strong { color: #3fb950; font-size: .82rem; font-weight: 650; }
 .attendance-summary-line > div span, .records-count { color: #3fb950; font-size: .73rem; }
-.attendance-table-panel { padding: 0; overflow: hidden; }
+.attendance-table-panel { padding: 0; overflow: visible; }
 .attendance-controls { min-height: 66px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 13px 17px; border-bottom: 1px solid var(--line); }
 .search-control { width: min(300px, 100%); }
 .search-control svg { flex: 0 0 auto; color: #3fb950; }
@@ -31,7 +31,7 @@
 .attendance-empty { min-height: 210px; }
 @media (max-width: 760px) {
   .attendance-summary-line { align-items: flex-start; flex-direction: column; }
-  .attendance-controls { align-items: stretch; }
+  .attendance-controls { align-items: center; }
   .search-control { width: 100%; }
   .mark-legend { width: 100%; margin: 3px 0 0; }
   .attendance-table-footer { flex-direction: column; }
