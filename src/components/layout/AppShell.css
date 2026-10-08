@@ -7,7 +7,7 @@
 .brand-lockup span { color: var(--muted-strong); font-size: .68rem; }
 .workspace-switcher { display: flex; align-items: center; gap: 10px; position:relative; margin: 27px 0 25px; padding: 11px 10px; background: var(--surface-soft); border: 1px solid var(--line); border-radius: 9px; }
 .workspace-switcher-open { border-color:var(--brand); }
-.workspace-avatar { width: 32px; height: 32px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 8px; color: #79c0ff; background: var(--brand-pale); font-size: .65rem; font-weight: 750; }
+.workspace-avatar { width: 34px; height: 34px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 8px; color: #79c0ff; background: var(--brand-pale); font-size: .65rem; font-weight: 750; }
 .workspace-copy { min-width: 0; display: grid; flex: 1; gap: 2px; }
 .workspace-copy>span { color: var(--muted); font-size: .65rem; }
 .workspace-trigger { width:100%; min-width:0; display:flex; align-items:center; justify-content:space-between; gap:6px; padding:2px 0; color:var(--ink); background:transparent; border:0; cursor:pointer; font:650 .73rem "DM Sans",sans-serif; text-align:left; }
@@ -64,7 +64,7 @@
 .brand-lockup strong { font-size: .97rem; }
 .brand-lockup span, .workspace-copy > span { color: #3fb950; }
 .workspace-switcher { background: var(--surface-soft); border-color: var(--line); }
-.workspace-avatar { color: #79c0ff; background: var(--brand-pale); }
+.workspace-avatar { width: 34px; height: 34px; border-radius: 9px; color: #79c0ff; background: var(--brand-pale); }
 .nav-section-label { color: #3fb950; letter-spacing: .065em; }
 .nav-link { min-height: 43px; color: #3fb950; }
 .nav-link svg { color: var(--muted-strong); }
@@ -108,3 +108,5 @@
   .sidebar { visibility: hidden; transition: transform .22s cubic-bezier(.22,1,.36,1), visibility 0s linear .22s; }
   .sidebar-open { visibility: visible; transition-delay: 0s; }
 }
+
+.app-frame .sign-out-button:hover,.app-frame .sign-out-button:focus-visible{color:#ff7b72 !important;border-color:#f85149 !important;box-shadow:0 0 0 1px #f85149;background:rgb(248 81 73 / 10%)}

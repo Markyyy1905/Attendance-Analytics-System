@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, BookOpen, CalendarDays, FileUp, Search, UsersRound } from "lucide-react";
+import { ArrowRight, CalendarDays, FileUp, Search, UsersRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PageHeader } from "../../../components/ui/PageHeader";
 import { NoStudentsState } from "../../../components/ui/NoStudentsState";
@@ -9,6 +9,14 @@ import "./ClassesPage.css";
 
 function formatDate(value: string | null) {
   return value ? new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(new Date(value)) : "No import yet";
+}
+
+function classInitials(subject: string, code: string) {
+  const source = code.trim() || subject.trim();
+  const words = source.split(/[^A-Za-z0-9]+/).filter(Boolean);
+  if (words.length > 1) return words.slice(0, 2).map((word) => word[0]).join("").toUpperCase();
+  const compact = words[0] || "CL";
+  return compact.replace(/\d+.*$/, "").slice(0, 2).toUpperCase() || compact.slice(0, 2).toUpperCase();
 }
 
 export function ClassesPage() {
@@ -41,7 +49,7 @@ export function ClassesPage() {
     </section>
 
     {isLoading ? <div className="class-empty"><strong>Loading your classes</strong><span>Connecting to your saved attendance workspace.</span></div> : dataError && !classes.length ? <div className="class-empty" role="alert"><strong>Classes could not be loaded</strong><span>{dataError}</span></div> : !classes.length ? <NoStudentsState /> : !filtered.length ? <div className="class-empty"><Search size={22} /><strong>No classes match those filters</strong><span>Try another class name or term.</span></div> : <div className="class-table-wrap"><table className="class-table"><thead><tr><th>Class</th><th>Term</th><th>Students</th><th>Sessions</th><th>Last import</th><th>Access</th><th /></tr></thead><tbody>{filtered.map((item) => <tr key={item.id} className={item.id === activeClassId ? "class-row-active" : ""}>
-      <td><div className="class-name"><span className="class-icon"><BookOpen size={17} /></span><span><strong>{item.subject}</strong><small>{item.class_code} / {item.section} / {item.grade_level}</small></span></div></td>
+      <td><div className="class-name"><span className="class-icon" aria-label={`${item.subject} workspace`}>{classInitials(item.subject, item.class_code)}</span><span><strong>{item.subject}</strong><small>{item.class_code} / {item.section} / {item.grade_level}</small></span></div></td>
       <td>{item.term}</td>
       <td><span className="class-count"><UsersRound size={14} />{item.student_count}</span></td>
       <td><span className="class-count"><CalendarDays size={14} />{item.session_count}</span></td>

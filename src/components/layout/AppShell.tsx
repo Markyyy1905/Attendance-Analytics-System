@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import {
-  Activity,
   BarChart3,
   BookOpenCheck,
   Layers3,
@@ -25,7 +24,7 @@ const workspaceLinks = [
 
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { dataset, classes, activeClassId, selectClass, isLoading, dataError, user, signOut } = useAttendanceData();
+  const { dataset, classes, activeClassId, selectClass, isLoading, user, signOut } = useAttendanceData();
   const assignedClasses = classes.filter((item) => item.assigned);
 
 
@@ -55,10 +54,6 @@ export function AppShell() {
           </NavLink>
         </nav>
 
-        <div className="sidebar-foot">
-          <div className="data-status"><span className="status-indicator" /><div><strong>{dataError ? "Database unavailable" : isLoading ? "Loading PostgreSQL" : dataset.students.length ? "Saved attendance data" : "No attendance data"}</strong><span>{dataset.students.length} students · {dataset.dates.length} dates · {assignedClasses.length} assigned classes</span></div></div>
-          <div className="sidebar-foot-note"><Activity size={15} /><span>Attendance records persist in PostgreSQL</span></div>
-        </div>
       </aside>
 
       <div className="app-main">
@@ -66,8 +61,7 @@ export function AppShell() {
           <button className="icon-button mobile-menu" aria-label="Open navigation" aria-expanded={menuOpen} aria-controls="sidebar-navigation" onClick={() => setMenuOpen(true)}><Menu size={20} /></button>
           <div className="breadcrumb"><span>Workspace</span><span className="breadcrumb-separator">/</span><strong>{dataset.metadata.section ? `${dataset.metadata.section} · ${dataset.metadata.term}` : "Attendance overview"}</strong></div>
           <div className="topbar-tools">
-            <span className="prototype-badge"><span />{dataError ? " Database offline" : isLoading ? " Connecting…" : " PostgreSQL"}</span>
-            <div className="teacher-profile"><div className="teacher-avatar">{user?.display_name.split(/\s+/).slice(0,2).map((part)=>part[0]).join("").toUpperCase()||"U"}</div><div><strong>{user?.display_name}</strong><span>{user?.school_name} · {user?.roles.join(", ")}</span></div><button className="button button-secondary" onClick={()=>void signOut()}>Sign out</button></div>
+            <div className="teacher-profile"><div className="teacher-avatar">{user?.display_name.split(/\s+/).slice(0,2).map((part)=>part[0]).join("").toUpperCase()||"U"}</div><div><strong>{user?.display_name}</strong><span>{user?.school_name} · {user?.roles.join(", ")}</span></div><button className="button button-secondary sign-out-button" onClick={()=>void signOut()}>Sign out</button></div>
           </div>
         </header>
         <div className="main-content"><Outlet /></div>

@@ -92,3 +92,38 @@
  .success-actions { align-items: stretch; flex-direction: column; }
  .success-summary { gap: 6px; font-size: .63rem; }
 }
+
+
+/* Keep green for status and success states; normal page copy uses the neutral text scale. */
+.context-course-icon,
+.workspace-avatar { width: 34px; height: 34px; border-radius: 9px; color: #79c0ff; background: var(--brand-pale); }
+
+.context-detail strong,
+.overview-metric > span,
+.overview-metric > em,
+.class-rate > span,
+meter > div:last-child,
+.class-status-list > div > span,
+.class-status-list strong,
+.source-note > div strong,
+.all-clear,
+.all-clear strong,
+.class-name strong,
+.class-empty strong,
+.teacher-management-row > div strong,
+.import-step strong,
+.import-step-current strong,
+.import-upload-panel .panel-heading h2,
+.import-validation-panel .panel-heading h2,
+.drop-zone strong,
+.drop-zone > span:not(.upload-icon),
+.format-help span,
+.import-preview-summary strong,
+.import-success-panel h2,
+.import-success-panel > p,
+.import-success-panel > p strong { color: var(--ink-soft); }
+
+.overview-metric > strong,
+.class-rate strong { color: #58a6ff; }
+.class-empty > svg,
+.overview-metric > span svg { color: #58a6ff; }

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowDownToLine, ArrowRight, BookOpen, CalendarDays, CheckCircle2, CircleAlert, FileUp, UsersRound } from "lucide-react";
+import { ArrowDownToLine, ArrowRight, CalendarDays, CheckCircle2, CircleAlert, FileUp, UsersRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AttendanceTrendChart } from "../../../components/charts/AttendanceTrendChart";
 import { AttendanceMark, RiskLabel } from "../../../components/ui/AttendanceMark";
@@ -12,6 +12,13 @@ import "./OverviewPage.css";
 
 function initials(name: string) {
   return name.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+}
+
+function workspaceInitials(value: string) {
+  const words = value.trim().split(/[^A-Za-z0-9]+/).filter(Boolean);
+  if (words.length > 1) return words.slice(0, 2).map((word) => word[0]).join("").toUpperCase();
+  const compact = words[0] ?? "CL";
+  return compact.replace(/\d+.*$/, "").slice(0, 2).toUpperCase() || compact.slice(0, 2).toUpperCase();
 }
 
 export function OverviewPage() {
@@ -50,7 +57,9 @@ export function OverviewPage() {
       />
 
       <div className="overview-context">
-        <div className="context-course-icon"><BookOpen size={18} /></div>
+        <div className="context-course-icon workspace-avatar" aria-label={`${dataset.metadata.subjectCode || dataset.metadata.subjectTitle || "Class"} workspace`}>
+          {workspaceInitials(dataset.metadata.subjectCode || dataset.metadata.subjectTitle || "Class")}
+        </div>
         <div className="context-course-copy">
           <strong>{dataset.metadata.subjectTitle || "Attendance dataset"}</strong>
           <span>{[dataset.metadata.subjectCode, dataset.metadata.program, dataset.sections.join(", ")].filter(Boolean).join(" · ") || "Class details available after import"}</span>

@@ -2,6 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import type { TeachingClass } from "../../app/providers/AttendanceDataProvider";
 
+function getWorkspaceInitials(value: string) {
+  const words = value.trim().split(/[^A-Za-z0-9]+/).filter(Boolean);
+  if (words.length > 1) return words.slice(0, 2).map((word) => word[0]).join("").toUpperCase();
+  const compact = words[0] ?? "CL";
+  return compact.replace(/\d+.*$/, "").slice(0, 2).toUpperCase() || compact.slice(0, 2).toUpperCase();
+}
+
 function ClassSwitcherOption({ item, active, onSelect }: { item: TeachingClass; active: boolean; onSelect: (classId: string) => void }) {
   return <button
     type="button"
@@ -54,7 +61,7 @@ export function ClassSwitcher({
   }
 
   return <div className={`workspace-switcher ${open ? "workspace-switcher-open" : ""}`} ref={switcherRef}>
-    <div className="workspace-avatar">{workspaceCode.slice(0, 2) || "CL"}</div>
+    <div className="workspace-avatar" aria-label={`${workspaceCode || "Class"} workspace`} title={workspaceCode || "Class workspace"}>{getWorkspaceInitials(workspaceCode)}</div>
     <div className="workspace-copy">
       <span>Teaching workspace · {classes.length} assigned</span>
       <button className="workspace-trigger" type="button" disabled={!classes.length || isLoading} aria-expanded={open} aria-haspopup="listbox" onClick={() => setOpen((current) => !current)}>

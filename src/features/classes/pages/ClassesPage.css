@@ -11,9 +11,11 @@
 .class-table th { height: 43px; padding: 0 15px; color: var(--muted-strong); background: var(--surface-soft); border-bottom: 1px solid var(--line); font-size: .68rem; font-weight: 650; }
 .class-table td { height: 68px; padding: 9px 15px; color: var(--muted-strong); border-bottom: 1px solid var(--line); font-size: .76rem; }
 .class-table tr:last-child td { border-bottom: 0; }
-.class-row-active { background: var(--brand-pale); }
+.class-row-active { background: #1b2430; box-shadow: inset 3px 0 #58a6ff; }
+.class-row-active td { color: var(--ink-soft); }
+.class-row-active .class-icon { color: #a5d6ff; background: #1f3a5f; }
 .class-name { display: flex; align-items: center; gap: 10px; min-width: 205px; }
-.class-icon { width: 34px; height: 34px; display: grid; place-items: center; color: #58a6ff; background: var(--brand-pale); border-radius: 8px; }
+.class-icon { width: 34px; height: 34px; display: grid; place-items: center; color: #79c0ff; background: var(--brand-pale); border-radius: 9px; font-size: .65rem; font-weight: 750; letter-spacing: .02em; }
 .class-name > span:last-child { display: grid; gap: 4px; }
 .class-name strong { color: #3fb950; font-size: .78rem; font-weight: 650; }
 .class-name small, .class-source { color: var(--muted); font-size: .67rem; }
@@ -39,3 +41,38 @@
 .teacher-management-row > div { display: grid; gap: 3px; }
 .teacher-management-row > div span { color: var(--muted-strong); font-size: .67rem; }
 .teacher-management-row > div strong { color: #3fb950; font-size: .79rem; }
+
+
+/* Keep green for status and success states; normal page copy uses the neutral text scale. */
+.context-course-icon,
+.workspace-avatar { width: 34px; height: 34px; border-radius: 9px; color: #79c0ff; background: var(--brand-pale); }
+
+.context-detail strong,
+.overview-metric > span,
+.overview-metric > em,
+.class-rate > span,
+meter > div:last-child,
+.class-status-list > div > span,
+.class-status-list strong,
+.source-note > div strong,
+.all-clear,
+.all-clear strong,
+.class-name strong,
+.class-empty strong,
+.teacher-management-row > div strong,
+.import-step strong,
+.import-step-current strong,
+.import-upload-panel .panel-heading h2,
+.import-validation-panel .panel-heading h2,
+.drop-zone strong,
+.drop-zone > span:not(.upload-icon),
+.format-help span,
+.import-preview-summary strong,
+.import-success-panel h2,
+.import-success-panel > p,
+.import-success-panel > p strong { color: var(--ink-soft); }
+
+.overview-metric > strong,
+.class-rate strong { color: #58a6ff; }
+.class-empty > svg,
+.overview-metric > span svg { color: #58a6ff; }
