@@ -6,7 +6,6 @@ import {
   BookOpenCheck,
   Layers3,
   FileSpreadsheet,
-  GraduationCap,
   LayoutDashboard,
   Menu,
   UsersRound,
@@ -34,9 +33,8 @@ export function AppShell() {
     <div className="app-frame">
       {menuOpen && <button className="nav-scrim" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
       <aside id="sidebar-navigation" className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
-        <div className="brand-lockup">
-          <div className="brand-mark"><GraduationCap size={20} strokeWidth={1.9} /></div>
-          <div><strong>TalaTrack</strong><span>Attendance insights</span></div>
+        <div className="brand-lockup" aria-label="TalaTrack">
+          <img className="brand-logo-image" src="/talatrack-logo-transparent.png" alt="TalaTrack" />
           <button className="icon-button mobile-close" aria-label="Close navigation" onClick={() => setMenuOpen(false)}><X size={18} /></button>
         </div>
 

@@ -1,8 +1,8 @@
 .app-frame { min-height: 100vh; display: flex; }
 .sidebar { width: 252px; position: fixed; inset: 0 auto 0 0; z-index: 20; display: flex; flex-direction: column; padding: 22px 15px 16px; background: var(--sidebar); border-right: 1px solid var(--line); }
-.brand-lockup { min-height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 7px; }
-.brand-mark { width: 34px; height: 34px; display: grid; place-items: center; color: #fff; background: var(--brand); border-radius: 10px; }
-.brand-lockup > div:last-of-type { display: grid; gap: 1px; }
+.brand-lockup { min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0 7px; }
+.brand-logo-image { width: 154px; height: 58px; display: block; object-fit: contain; object-position: center; }
+.brand-wordmark { min-width: 0; display: grid; gap: 1px; visibility: visible; opacity: 1; }
 .brand-lockup strong { color: var(--ink); font: 750 .92rem "Manrope", sans-serif; letter-spacing: -.025em; }
 .brand-lockup span { color: var(--muted-strong); font-size: .68rem; }
 .workspace-switcher { display: flex; align-items: center; gap: 10px; position:relative; margin: 27px 0 25px; padding: 11px 10px; background: var(--surface-soft); border: 1px solid var(--line); border-radius: 9px; }
