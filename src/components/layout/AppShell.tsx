@@ -34,7 +34,8 @@ export function AppShell() {
       {menuOpen && <button className="nav-scrim" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
       <aside id="sidebar-navigation" className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
         <div className="brand-lockup" aria-label="TalaTrack">
-          <img className="brand-logo-image" src="/talatrack-logo-transparent.png" alt="TalaTrack" />
+          <img className="brand-mark-image" src="/image.png" alt="" aria-hidden="true" />
+          <div className="brand-wordmark"><strong>TalaTrack</strong><span>Attendance insights</span></div>
           <button className="icon-button mobile-close" aria-label="Close navigation" onClick={() => setMenuOpen(false)}><X size={18} /></button>
         </div>
 

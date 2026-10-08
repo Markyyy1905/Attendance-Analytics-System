@@ -1,7 +1,7 @@
 .app-frame { min-height: 100vh; display: flex; }
 .sidebar { width: 252px; position: fixed; inset: 0 auto 0 0; z-index: 20; display: flex; flex-direction: column; padding: 22px 15px 16px; background: var(--sidebar); border-right: 1px solid var(--line); }
-.brand-lockup { min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0 7px; }
-.brand-logo-image { width: 154px; height: 58px; display: block; object-fit: contain; object-position: center; }
+.brand-lockup { min-height: 40px; display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding: 0 7px; }
+.brand-mark-image { width: 34px; height: 34px; flex: 0 0 34px; display: block; object-fit: contain; object-position: center; }
 .brand-wordmark { min-width: 0; display: grid; gap: 1px; visibility: visible; opacity: 1; }
 .brand-lockup strong { color: var(--ink); font: 750 .92rem "Manrope", sans-serif; letter-spacing: -.025em; }
 .brand-lockup span { color: var(--muted-strong); font-size: .68rem; }
