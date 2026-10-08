@@ -100,6 +100,41 @@ export function getDateTrend(dataset: AttendanceDataset) {
   });
 }
 
+export function getStudentMonthlyTrend(student: AttendanceStudent) {
+  const months = new Map<string, { present: number; absent: number; late: number; excused: number; expected: number }>();
+  for (const session of student.sessions) {
+    const month = session.date.slice(0, 7);
+    const totals = months.get(month) ?? { present: 0, absent: 0, late: 0, excused: 0, expected: 0 };
+    totals.expected += 1;
+    if (session.status === "P") totals.present += 1;
+    else if (session.status === "A") totals.absent += 1;
+    else if (session.status === "L") totals.late += 1;
+    else if (session.status === "E") totals.excused += 1;
+    months.set(month, totals);
+  }
+
+  return [...months.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .flatMap(([month, totals]) => {
+      const recorded = totals.present + totals.absent + totals.late;
+      if (!recorded) return [];
+      const covered = recorded + totals.excused;
+      return [{
+        date: `${month}-01`,
+        rate: Math.round(((totals.present + totals.late) / recorded) * 100),
+        rateExact: ((totals.present + totals.late) / recorded) * 100,
+        present: totals.present,
+        absent: totals.absent,
+        late: totals.late,
+        recorded,
+        expected: totals.expected,
+        excused: totals.excused,
+        unrecorded: Math.max(0, totals.expected - covered),
+        coveragePercent: totals.expected ? Math.round((covered / totals.expected) * 100) : 0,
+      }];
+    });
+}
+
 export function getWeekdayTrend(dataset: AttendanceDataset) {
   const groups = new Map<number, { day: string; sessions: number; present: number; absent: number; late: number; excused: number; unrecorded: number; expected: number }>();
   for (const point of getDateTrend(dataset)) {
