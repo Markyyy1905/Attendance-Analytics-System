@@ -2,13 +2,13 @@ import { FilterPanel } from "../../../components/ui/FilterPanel";
 import { useMemo, useState } from "react";
 import { FileUp, Search } from "lucide-react";
 import { Link } from "react-router-dom";
+import { FilterCheckboxGroup } from "../../../components/ui/FilterCheckboxGroup";
 import { AttendanceMark, RiskLabel } from "../../../components/ui/AttendanceMark";
 import { PageHeader } from "../../../components/ui/PageHeader";
 import { NoStudentsState } from "../../../components/ui/NoStudentsState";
-import { AttendanceCoverageFilter, AttendancePeriodFilter, AttendanceSectionFilter, AttendanceStatusFilter } from "../components/AttendanceFilters";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { getStatusForDate, getStudentMetrics } from "../../../shared/lib/attendanceMetrics";
-import { filterDatesByPeriod, matchesCoverageFilter, matchesReviewFilter, type CoverageFilter, type PeriodFilter, type ReviewFilter } from "../../../shared/lib/attendanceFilters";
+import { filterDatesByPeriods, matchesCoverageFilter, matchesReviewFilter, type CoverageFilter, type PeriodSelection, type ReviewFilter } from "../../../shared/lib/attendanceFilters";
 import "./AttendancePage.css";
 
 function initials(name: string) { return name.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase(); }
@@ -17,21 +17,30 @@ function formatDate(date: string) { return new Intl.DateTimeFormat("en", { month
 export function AttendancePage() {
   const { dataset, isLoading, dataError } = useAttendanceData();
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<ReviewFilter>("all");
-  const [coverageFilter, setCoverageFilter] = useState<CoverageFilter>("all");
-  const [periodFilter, setPeriodFilter] = useState<PeriodFilter>("all");
-  const [sectionFilter, setSectionFilter] = useState("all");
-  const visibleDates = useMemo(() => filterDatesByPeriod(sectionFilter === "all"
-    ? dataset.dates
-    : [...new Set(dataset.students.filter((student) => student.section === sectionFilter).flatMap((student) => student.sessions.map((session) => session.date)))].sort(), periodFilter), [dataset, periodFilter, sectionFilter]);
+  const [statusFilters, setStatusFilters] = useState<ReviewFilter[]>([]);
+  const [coverageFilters, setCoverageFilters] = useState<CoverageFilter[]>([]);
+  const [periodFilters, setPeriodFilters] = useState<PeriodSelection[]>([]);
+  const [sectionFilters, setSectionFilters] = useState<string[]>([]);
+  const visibleDates = useMemo(() => {
+    const sections = new Set(sectionFilters);
+    const dates = sectionFilters.length
+      ? [...new Set(dataset.students.filter((student) => sections.has(student.section)).flatMap((student) => student.sessions.map((session) => session.date)))].sort()
+      : dataset.dates;
+    return filterDatesByPeriods(dates, periodFilters);
+  }, [dataset, periodFilters, sectionFilters]);
   const visibleDateSet = useMemo(() => new Set(visibleDates), [visibleDates]);
   const students = useMemo(() => dataset.students.flatMap((student) => {
-    if (sectionFilter !== "all" && student.section !== sectionFilter) return [];
+    if (sectionFilters.length && !sectionFilters.includes(student.section)) return [];
     const scopedStudent = { ...student, sessions: student.sessions.filter((session) => visibleDateSet.has(session.date)) };
     const metrics = getStudentMetrics(scopedStudent);
     const matchesName = student.name.toLowerCase().includes(search.trim().toLowerCase());
-    return matchesName && matchesReviewFilter(metrics, statusFilter) && matchesCoverageFilter(metrics, coverageFilter) ? [{ student, metrics }] : [];
-  }), [coverageFilter, dataset.students, search, sectionFilter, statusFilter, visibleDateSet]);
+    return matchesName
+      && (!statusFilters.length || statusFilters.some((filter) => matchesReviewFilter(metrics, filter)))
+      && (!coverageFilters.length || coverageFilters.some((filter) => matchesCoverageFilter(metrics, filter)))
+      ? [{ student, metrics }] : [];
+  }), [coverageFilters, dataset.students, search, sectionFilters, statusFilters, visibleDateSet]);
+  const activeFilterCount = statusFilters.length + coverageFilters.length + periodFilters.length + sectionFilters.length;
+  const clearFilters = () => { setStatusFilters([]); setCoverageFilters([]); setPeriodFilters([]); setSectionFilters([]); };
 
   return (
     <main className="page-attendance">
@@ -45,10 +54,12 @@ export function AttendancePage() {
       <section className="panel attendance-table-panel">
         <div className="attendance-controls">
           <label className="search-control"><Search size={16} /><span className="sr-only">Search students</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search students" /></label>
-          <FilterPanel><AttendancePeriodFilter value={periodFilter} onChange={setPeriodFilter} />
-          <AttendanceStatusFilter value={statusFilter} onChange={setStatusFilter} />
-          <AttendanceCoverageFilter value={coverageFilter} onChange={setCoverageFilter} />
-          {dataset.sections.length > 1 && <AttendanceSectionFilter sections={dataset.sections} value={sectionFilter} onChange={setSectionFilter} />}
+          <FilterPanel activeCount={activeFilterCount}>
+            <FilterCheckboxGroup label="Reporting period" options={[{ value: "last-30-days", label: "Last 30 days" }, { value: "recent-10", label: "Latest 10 sessions" }, { value: "recent-5", label: "Latest 5 sessions" }]} selected={periodFilters} onChange={setPeriodFilters} />
+            <FilterCheckboxGroup label="Review status" options={[{ value: "needs-review", label: "Needs review" }, { value: "on-track", label: "No active flags" }]} selected={statusFilters} onChange={setStatusFilters} />
+            <FilterCheckboxGroup label="Record completeness" options={[{ value: "complete", label: "Complete records" }, { value: "missing", label: "Has unrecorded sessions" }]} selected={coverageFilters} onChange={setCoverageFilters} />
+            {dataset.sections.length > 1 && <FilterCheckboxGroup label="Section" options={dataset.sections.map((section) => ({ value: section, label: section }))} selected={sectionFilters} onChange={setSectionFilters} />}
+            <button className="button button-secondary" type="button" onClick={clearFilters} disabled={!activeFilterCount}>Clear filters</button>
           </FilterPanel><span className="mark-legend"><span><AttendanceMark status="P" /> Present</span><span><AttendanceMark status="A" /> Absent</span><span><AttendanceMark status="L" /> Late</span></span>
         </div>
         {isLoading ? <div className="empty-state attendance-empty"><strong>Loading attendance</strong><span>Retrieving class sessions and marks.</span></div> : dataError && !dataset.students.length ? <div className="empty-state attendance-empty" role="alert"><strong>Attendance unavailable</strong><span>{dataError}</span></div> : students.length ? <div className="data-table-wrap attendance-matrix-wrap">

@@ -24,6 +24,4 @@
   .students-toolbar { align-items: flex-start; flex-direction: column; }
   .students-filters { width: 100%; justify-content: stretch; }
   .students-filters .search-control { width: 100%; flex: 1; }
-  .students-filters .select-control { min-width: 145px; flex: 1; }
 }
-@media (max-width: 540px) { .students-filters .select-control { width: 100%; } }

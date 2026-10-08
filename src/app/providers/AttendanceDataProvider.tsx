@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { AttendanceDataset } from "../../shared/types/attendance";
 export interface TeachingClass { id:string; subject:string; class_code:string; section:string; grade_level:string; term:string; source_filename:string|null; uploaded_at:string|null; student_count:number; session_count:number; assigned:boolean }
 export interface TeacherAccount { id:string; display_name:string; email:string }
-export interface AppUser { id:string; school_id:string; display_name:string; email:string; school_name:string; roles:string[] }
+export interface AppUser { id:string; school_id:string; display_name:string; email:string; school_name:string; roles:string[]; school_roles:string[] }
 export interface ReportRequest { classId:string; reportType:"class_analytics"; format:"csv"|"xlsx"; filters:{section:string;dateRange:string;startDate:string;endDate:string;studentSearchApplied:boolean;studentCount:number;sessionCount:number} }
 export interface ReportReceipt { id:string; generatedAt:string }
 const emptyDataset=():AttendanceDataset=>({metadata:{subjectTitle:"",subjectCode:"",term:"",program:"",section:"",scheduleDays:[],scheduleTimes:[]},sections:[],dates:[],students:[],sourceName:"PostgreSQL",importedAt:""});
@@ -17,8 +17,8 @@ export function AttendanceDataProvider({children}:{children:ReactNode}){
  const selectClass=useCallback(async(id:string)=>{if(id!==activeClassId)await loadClass(id);},[activeClassId,loadClass]);
  const selectTeacher=useCallback(async(id:string)=>{setActiveTeacherId(id);setDataError("");try{const b=await api(`/api/classes?teacherId=${encodeURIComponent(id)}&manage=1`);setManagementClasses(b.classes||[]);}catch(e){setManagementClasses([]);setDataError(e instanceof Error?e.message:"Could not load assignments.");}},[]);
  const refreshClasses=useCallback(()=>getClasses(),[getClasses]);
- const refreshTeachers=useCallback(async()=>{if(!(user?.roles.includes("administrator")||user?.roles.includes("technical_administrator")))return;try{const b=await api("/api/teachers");setTeachers(b.teachers||[]);}catch(e){setTeachers([]);setDataError(e instanceof Error?e.message:"Could not load staff.");}},[user]);
- const signIn=useCallback(async(email:string,password:string)=>{const b=await api("/api/auth/login",{method:"POST",body:JSON.stringify({email,password})});setUser(b.user);setActiveTeacherId(b.user.id);},[]);
+ const refreshTeachers=useCallback(async()=>{if(!(user?.school_roles.includes("administrator")||user?.school_roles.includes("technical_administrator")))return;try{const b=await api("/api/teachers");setTeachers(b.teachers||[]);}catch(e){setTeachers([]);setDataError(e instanceof Error?e.message:"Could not load staff.");}},[user]);
+ const signIn=useCallback(async(email:string,password:string)=>{await api("/api/auth/login",{method:"POST",body:JSON.stringify({email,password})});const b=await api("/api/auth/me");setUser(b.user);setActiveTeacherId(b.user.id);},[]);
  const signUp=useCallback(async(data:{name:string;school:string;email:string;password:string})=>{const b=await api("/api/auth/register",{method:"POST",body:JSON.stringify(data)});setUser(b.user);setActiveTeacherId(b.user.id);},[]);
  const signOut=useCallback(async()=>{try{await api("/api/auth/logout",{method:"POST",body:"{}"});}finally{setUser(null);setTeachers([]);setClasses([]);setDataset(emptyDataset());setActiveClassId("");setActiveTeacherId("");}},[]);
  const createTeacher=useCallback(async(displayName:string,email:string,password:string,role:string)=>{const b=await api("/api/teachers",{method:"POST",body:JSON.stringify({displayName,email,password,role})});await refreshTeachers();await selectTeacher(b.teacher.id);},[refreshTeachers,selectTeacher]);

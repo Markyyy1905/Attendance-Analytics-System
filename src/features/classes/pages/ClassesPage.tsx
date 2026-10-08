@@ -38,7 +38,7 @@ export function ClassesPage() {
     finally { setOpeningClassId(""); }
   }
 
-  const canManageStaff = user?.roles.includes("administrator") || user?.roles.includes("technical_administrator");
+  const canManageStaff = user?.school_roles.includes("administrator") || user?.school_roles.includes("technical_administrator");
 
   return <main className="page-classes">
     <PageHeader title="My classes" description="Move between class sections without mixing their attendance records." actions={<Link className="button button-primary" to="/import"><FileUp size={16} /> Add attendance data</Link>} />

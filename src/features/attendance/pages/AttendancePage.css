@@ -8,9 +8,6 @@
 .search-control svg { flex: 0 0 auto; color: #3fb950; }
 .search-control input { width: 100%; min-width: 0; color: #3fb950; border: 0; outline: 0; background: transparent; font-size: .81rem; }
 .search-control input::placeholder { color: var(--muted); }
-.attendance-filter { min-width: 160px; }
-.attendance-filter svg { color: #3fb950; flex: 0 0 auto; }
-.attendance-filter .select-field-trigger { color:var(--ink-soft); }
 .mark-legend { display: flex; align-items: center; gap: 13px; margin-left: auto; padding-left: 8px; }
 @media (max-width: 1180px) { .mark-legend { width: 100%; margin-left: 0; padding: 3px 0 0; } }
 .mark-legend > span { display: inline-flex; align-items: center; gap: 5px; color: #3fb950; font-size: .7rem; }
@@ -36,7 +33,6 @@
   .attendance-summary-line { align-items: flex-start; flex-direction: column; }
   .attendance-controls { align-items: stretch; }
   .search-control { width: 100%; }
-  .attendance-filter { width: 100%; }
   .mark-legend { width: 100%; margin: 3px 0 0; }
   .attendance-table-footer { flex-direction: column; }
 }

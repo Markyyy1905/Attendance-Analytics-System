@@ -52,7 +52,7 @@ export function AppShell() {
               <Icon size={18} strokeWidth={1.8} /><span>{label}</span>
             </NavLink>
           ))}
-          {(user?.roles.includes("administrator") || user?.roles.includes("technical_administrator")) && <NavLink to="/staff" className={({ isActive }) => `nav-link ${isActive ? "nav-link-active" : ""}`} onClick={() => setMenuOpen(false)}><UsersRound size={18} strokeWidth={1.8} /><span>Staff and access</span></NavLink>}
+          {(user?.school_roles.includes("administrator") || user?.school_roles.includes("technical_administrator")) && <NavLink to="/staff" className={({ isActive }) => `nav-link ${isActive ? "nav-link-active" : ""}`} onClick={() => setMenuOpen(false)}><UsersRound size={18} strokeWidth={1.8} /><span>Staff and access</span></NavLink>}
           <span className="nav-section-label nav-section-spaced">Data</span>
           <NavLink to="/import" className={({ isActive }) => `nav-link ${isActive ? "nav-link-active" : ""}`} onClick={() => setMenuOpen(false)}>
             <FileSpreadsheet size={18} strokeWidth={1.8} /><span>Import attendance</span>

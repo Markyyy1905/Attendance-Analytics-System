@@ -1,8 +1,15 @@
 .filter-panel { width:100%; min-width:0; }
-.filter-panel > summary { cursor:pointer; color:var(--ink); padding:10px 12px; border:1px solid var(--line); border-radius:8px; width:fit-content; font-size:.82rem; }
+.filter-panel > summary { cursor:pointer; color:var(--ink); padding:10px 12px; border:1px solid var(--line); border-radius:8px; width:fit-content; font-size:.82rem; list-style:none; }
+.filter-panel > summary::-webkit-details-marker { display:none; }
+.filter-panel > summary::before { content:"+"; display:inline-block; margin-right:8px; color:var(--brand); }
+.filter-panel[open] > summary::before { content:"-"; }
 .filter-panel > summary:focus-visible { outline:2px solid var(--brand); outline-offset:3px; }
-.filter-panel-fields { display:flex; flex-wrap:wrap; align-items:end; gap:12px; padding-top:12px; }
+.filter-panel-fields { display:flex; flex-wrap:wrap; align-items:flex-start; gap:18px; padding:15px 2px 2px; }
 .filter-panel:not([open]) .filter-panel-fields { display:none; }
-.filter-panel-fields > * { min-width:170px; flex:1; }
+.filter-checkbox-group { display:grid; align-content:start; gap:8px; min-width:145px; margin:0; padding:0; border:0; }
+.filter-checkbox-group legend { margin-bottom:4px; color:var(--muted-strong); font-size:.76rem; font-weight:700; }
+.filter-checkbox-option { display:flex; align-items:center; gap:8px; color:var(--ink-soft); font-size:.78rem; font-weight:400; cursor:pointer; }
+.filter-checkbox-option input { width:15px; height:15px; margin:0; accent-color:var(--brand); }
+.filter-panel-fields .button { align-self:flex-end; }
 .students-panel, .attendance-table-panel { overflow:visible; }
-@media(max-width:600px) { .filter-panel-fields { flex-direction:column; align-items:stretch; } .filter-panel-fields > * { width:100%; min-width:0; } }
+@media(max-width:600px) { .filter-panel-fields { gap:14px; } .filter-checkbox-group { min-width:calc(50% - 8px); } }

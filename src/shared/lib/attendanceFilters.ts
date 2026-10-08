@@ -4,6 +4,7 @@ export type ReviewFilter = "all" | "needs-review" | "on-track";
 export type CoverageFilter = "all" | "complete" | "missing";
 export type RateFilter = "all" | "below-75" | "75-89" | "90-100" | "no-rate";
 export type PeriodFilter = "all" | "last-30-days" | "recent-10" | "recent-5";
+export type PeriodSelection = Exclude<PeriodFilter, "all">;
 
 export function matchesReviewFilter(metrics: StudentMetrics, filter: ReviewFilter) {
   if (filter === "all") return true;
@@ -39,9 +40,19 @@ export function filterDatesByPeriod(dates: string[], filter: PeriodFilter) {
   return dates;
 }
 
+export function filterDatesByPeriods(dates: string[], filters: PeriodSelection[]) {
+  if (!filters.length) return dates;
+  const selectedDates = new Set(filters.flatMap((filter) => filterDatesByPeriod(dates, filter)));
+  return dates.filter((date) => selectedDates.has(date));
+}
+
 export const periodFilterLabel = (filter: PeriodFilter) => ({
   all: "Entire class history",
   "last-30-days": "Last 30 days",
   "recent-10": "Latest 10 sessions",
   "recent-5": "Latest 5 sessions",
 })[filter];
+
+export function periodFiltersLabel(filters: PeriodSelection[]) {
+  return filters.length ? filters.map(periodFilterLabel).join(" + ") : periodFilterLabel("all");
+}

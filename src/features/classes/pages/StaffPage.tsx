@@ -14,7 +14,7 @@ export function StaffPage() {
   useEffect(() => { void refreshTeachers(); }, [refreshTeachers]);
   const [savingClassId, setSavingClassId] = useState("");
   const [assignmentError, setAssignmentError] = useState("");
-  const isAdministrator = user?.roles.includes("administrator") || user?.roles.includes("technical_administrator");
+  const isAdministrator = user?.school_roles.includes("administrator") || user?.school_roles.includes("technical_administrator");
 
   if (!isAdministrator) return <Navigate to="/dashboard" replace />;
 
@@ -38,7 +38,7 @@ export function StaffPage() {
     <section className="panel staff-access-panel">
       <div className="staff-access-heading">
         <div><h2>Class assignments</h2><p>All active staff in this school are listed. Create staff here to add them to this school.</p></div>
-        <button className="button button-secondary" type="button" onClick={()=>void refreshTeachers()}>Refresh staff</button><StaffMemberSelect staff={teachers} value={activeTeacherId} onChange={(id) => void selectTeacher(id)} />
+        <StaffMemberSelect staff={teachers} value={activeTeacherId} onChange={(id) => void selectTeacher(id)} />
       </div>
       {dataError && <p className="staff-form-error" role="alert">{dataError}</p>}
       {assignmentError && <p className="staff-form-error" role="alert">{assignmentError}</p>}
