@@ -77,6 +77,8 @@ export function buildAnalyticsWorkbook(report: AnalyticsReportInput) {
     row(["Section", report.filters.section || dataset.metadata.section || "All sections"]),
     row(["Term", dataset.metadata.term || "Not provided"]),
     row(["Date range", dates.length ? String(dates[0]) + " to " + String(dates[dates.length - 1]) : "No eligible dates"]),
+    row(["Review status filter", report.filters.reviewStatus || "all"]),
+    row(["Record completeness filter", report.filters.recordCompleteness || "all"]),
     row([], "Cell"),
     row(["CLASS SUMMARY"], "Section"),
     row(["Attendance rate", rate(summary.attendanceRate)], "Metric"),

@@ -9,27 +9,31 @@ import { AnalyticsFilters } from "../components/AnalyticsFilters";
 import { NoStudentsState } from "../../../components/ui/NoStudentsState";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { getAttendanceForecast, getDateTrend, getDatasetSummary, getStudentMetrics, getWeekdayTrend } from "../../../shared/lib/attendanceMetrics";
+import { filterDatesByPeriod, matchesCoverageFilter, matchesReviewFilter, periodFilterLabel, type CoverageFilter, type PeriodFilter, type ReviewFilter } from "../../../shared/lib/attendanceFilters";
 import { buildAnalyticsWorkbook, analyticsWorkbookFilename } from "../lib/exportAnalyticsWorkbook";
 import "./AnalyticsPage.css";
 
 export function AnalyticsPage() {
   const { dataset, isLoading, dataError, activeClassId, recordReport } = useAttendanceData();
-  const [rangeFilter, setRangeFilter] = useState("all");
+  const [rangeFilter, setRangeFilter] = useState<PeriodFilter>("all");
   const [studentFilter, setStudentFilter] = useState("");
+  const [reviewFilter, setReviewFilter] = useState<ReviewFilter>("all");
+  const [coverageFilter, setCoverageFilter] = useState<CoverageFilter>("all");
   const [reportPending, setReportPending] = useState(false);
   const [reportError, setReportError] = useState("");
   const scopedDataset = useMemo(() => {
     const query = studentFilter.trim().toLocaleLowerCase();
-    const selectedStudents = dataset.students.filter((student) =>
-      (!query || student.name.toLocaleLowerCase().includes(query)),
-    );
-    const limit = rangeFilter === "recent5" ? 5 : rangeFilter === "recent10" ? 10 : dataset.dates.length;
-    const dates = dataset.dates.slice(-limit);
+    const dates = filterDatesByPeriod(dataset.dates, rangeFilter);
     const includedDates = new Set(dates);
-    const students = selectedStudents.map((student) => ({ ...student, sessions: student.sessions.filter((session) => includedDates.has(session.date)) }));
+    const students = dataset.students
+      .map((student) => ({ ...student, sessions: student.sessions.filter((session) => includedDates.has(session.date)) }))
+      .filter((student) => {
+        const metrics = getStudentMetrics(student);
+        return (!query || student.name.toLocaleLowerCase().includes(query)) && matchesReviewFilter(metrics, reviewFilter) && matchesCoverageFilter(metrics, coverageFilter);
+      });
     const expectedRosterByDate = Object.fromEntries(dates.map((date) => [date, students.reduce((count, student) => count + Number(student.sessions.some((session) => session.date === date)), 0)]));
     return { ...dataset, dates, students, expectedRosterByDate };
-  }, [dataset, rangeFilter, studentFilter]);
+  }, [coverageFilter, dataset, rangeFilter, reviewFilter, studentFilter]);
   const summary = useMemo(() => getDatasetSummary(scopedDataset), [scopedDataset]);
   const trend = useMemo(() => getDateTrend(scopedDataset), [scopedDataset]);
   const weekdays = useMemo(() => getWeekdayTrend(scopedDataset), [scopedDataset]);
@@ -71,7 +75,7 @@ export function AnalyticsPage() {
         format: "xlsx",
         filters: {
           section: "Active workspace",
-          dateRange: rangeFilter === "all" ? "All dates" : rangeFilter === "recent10" ? "Recent 10 sessions" : "Recent 5 sessions",
+          dateRange: periodFilterLabel(rangeFilter),
           startDate: scopedDataset.dates[0] || "",
           endDate: scopedDataset.dates.at(-1) || "",
           studentSearchApplied: Boolean(studentFilter.trim()),
@@ -97,8 +101,10 @@ export function AnalyticsPage() {
         generatedAt: new Date(receipt.generatedAt).toISOString(),
         filters: {
           section: "Active workspace",
-          dateRange: rangeFilter === "all" ? "All dates" : rangeFilter === "recent10" ? "Recent 10 sessions" : "Recent 5 sessions",
+          dateRange: periodFilterLabel(rangeFilter),
           studentSearchApplied: Boolean(studentFilter.trim()),
+          reviewStatus: reviewFilter,
+          recordCompleteness: coverageFilter,
         },
       });
       const url = URL.createObjectURL(new Blob([report], { type: "application/vnd.ms-excel" }));
@@ -123,8 +129,8 @@ export function AnalyticsPage() {
     <main className="page-analytics">
       <PageHeader title="Class analytics" description="Explore attendance patterns across recorded sessions and identify where follow-up may help." actions={<><button className="button button-secondary" type="button" onClick={() => void downloadReport()} disabled={reportPending || !activeClassId}><Download size={15} /> {reportPending ? "Preparing Excel report..." : "Download Excel report"}</button><Link className="button button-secondary" to="/import"><FileUp size={15} /> Import attendance</Link></>} />
       {reportError && <p className="analytics-export-error" role="alert">Report was not generated: {reportError}</p>}
-      <div className="analytics-scope"><span className="scope-dot" /><span>{dataset.metadata.subjectTitle || "Current class"}</span><i />{dataset.metadata.term || "Current term"}<i />{scopedDataset.dates.length} selected dates</div>
-      <section className="panel analytics-filter-panel"><AnalyticsFilters dateRange={rangeFilter} onDateRangeChange={setRangeFilter} student={studentFilter} onStudentChange={setStudentFilter} /></section>
+      <div className="analytics-scope"><span className="scope-dot" /><span>{dataset.metadata.subjectTitle || "Current class"}</span><i />{dataset.metadata.term || "Current term"}<i />{scopedDataset.students.length} of {dataset.students.length} students<i />{scopedDataset.dates.length} selected dates</div>
+      <section className="panel analytics-filter-panel"><AnalyticsFilters dateRange={rangeFilter} onDateRangeChange={setRangeFilter} student={studentFilter} onStudentChange={setStudentFilter} review={reviewFilter} onReviewChange={setReviewFilter} coverage={coverageFilter} onCoverageChange={setCoverageFilter} onReset={() => { setRangeFilter("all"); setStudentFilter(""); setReviewFilter("all"); setCoverageFilter("all"); }} /></section>
       <section className="analytics-metric-strip" aria-label="Analytics summary">
         <div className="analytics-metric-card"><span>Class attended rate</span><strong>{summary.attendanceRate === null ? "—" : `${summary.attendanceRate}%`}</strong></div>
         <div className="analytics-metric-card"><span>Roster coverage</span><strong>{summary.coveragePercent}%</strong></div>

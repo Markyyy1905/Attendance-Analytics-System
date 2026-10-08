@@ -8,7 +8,7 @@
 .students-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 19px 18px; border-bottom: 1px solid var(--line); }
 .students-toolbar h2 { margin: 0; color: #3fb950; font: 650 1rem "Manrope", sans-serif; }
 .students-toolbar p { margin: 5px 0 0; color: var(--muted-strong); font-size: .74rem; }
-.students-filters { display: flex; align-items: center; gap: 9px; }
+.students-filters { display: flex; align-items: center; justify-content: flex-end; gap: 9px; flex-wrap: wrap; }
 .students-filters .search-control { width: 220px; }
 .student-roster td:nth-child(2) { color: var(--muted-strong); font-size: .75rem; }
 .student-roster td:last-child { text-align: right; }
@@ -22,7 +22,8 @@
   .students-overview-strip strong { font-size: 1.1rem; }
   .students-overview-strip span { font-size: .65rem; }
   .students-toolbar { align-items: flex-start; flex-direction: column; }
-  .students-filters { width: 100%; }
+  .students-filters { width: 100%; justify-content: stretch; }
   .students-filters .search-control { width: 100%; flex: 1; }
-  .students-filters .select-control { min-width: 120px; }
+  .students-filters .select-control { min-width: 145px; flex: 1; }
 }
+@media (max-width: 540px) { .students-filters .select-control { width: 100%; } }

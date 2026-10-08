@@ -11,7 +11,8 @@
 .attendance-filter { min-width: 160px; }
 .attendance-filter svg { color: #3fb950; flex: 0 0 auto; }
 .attendance-filter .select-field-trigger { color:var(--ink-soft); }
-.mark-legend { display: flex; align-items: center; gap: 13px; margin-left: auto; }
+.mark-legend { display: flex; align-items: center; gap: 13px; margin-left: auto; padding-left: 8px; }
+@media (max-width: 1180px) { .mark-legend { width: 100%; margin-left: 0; padding: 3px 0 0; } }
 .mark-legend > span { display: inline-flex; align-items: center; gap: 5px; color: #3fb950; font-size: .7rem; }
 .mark-legend .attendance-mark { width: 21px; height: 20px; font-size: .65rem; }
 .attendance-matrix { min-width: 1050px; }

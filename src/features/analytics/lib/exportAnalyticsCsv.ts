@@ -15,7 +15,7 @@ export interface AnalyticsReportInput {
   students: Array<{ name: string; section: string; gradeLevel?: string; metrics: StudentMetrics }>;
   reportId: string;
   generatedAt: string;
-  filters: { section: string; dateRange: string; studentSearchApplied: boolean };
+  filters: { section: string; dateRange: string; studentSearchApplied: boolean; reviewStatus?: string; recordCompleteness?: string };
 }
 
 function csvCell(value: unknown) {

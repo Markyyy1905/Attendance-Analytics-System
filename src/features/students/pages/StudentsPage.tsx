@@ -4,9 +4,10 @@ import { Link } from "react-router-dom";
 import { RiskLabel } from "../../../components/ui/AttendanceMark";
 import { PageHeader } from "../../../components/ui/PageHeader";
 import { NoStudentsState } from "../../../components/ui/NoStudentsState";
-import { StudentSectionFilter, StudentStatusFilter } from "../components/StudentFilters";
+import { StudentCoverageFilter, StudentRateFilter, StudentSectionFilter, StudentStatusFilter } from "../components/StudentFilters";
 import { useAttendanceData } from "../../../app/providers/AttendanceDataProvider";
 import { getStudentMetrics } from "../../../shared/lib/attendanceMetrics";
+import { matchesCoverageFilter, matchesRateFilter, matchesReviewFilter, type CoverageFilter, type RateFilter, type ReviewFilter } from "../../../shared/lib/attendanceFilters";
 import "./StudentsPage.css";
 
 function initials(name: string) { return name.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase(); }
@@ -14,11 +15,13 @@ function initials(name: string) { return name.split(/\s+/).slice(0, 2).map((part
 export function StudentsPage() {
   const { dataset, isLoading, dataError } = useAttendanceData();
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState<ReviewFilter>("all");
+  const [rateFilter, setRateFilter] = useState<RateFilter>("all");
+  const [coverageFilter, setCoverageFilter] = useState<CoverageFilter>("all");
   const [sectionFilter, setSectionFilter] = useState("all");
   const students = useMemo(() => dataset.students
     .map((student) => ({ student, metrics: getStudentMetrics(student) }))
-    .filter(({ student, metrics }) => student.name.toLowerCase().includes(search.toLowerCase()) && (filter === "all" || (filter === "risk" ? metrics.riskReasons.length > 0 : metrics.riskReasons.length === 0)) && (sectionFilter === "all" || student.section === sectionFilter)), [dataset, search, filter, sectionFilter]);
+    .filter(({ student, metrics }) => student.name.toLowerCase().includes(search.trim().toLowerCase()) && matchesReviewFilter(metrics, filter) && matchesRateFilter(metrics, rateFilter) && matchesCoverageFilter(metrics, coverageFilter) && (sectionFilter === "all" || student.section === sectionFilter)), [coverageFilter, dataset, search, filter, rateFilter, sectionFilter]);
   const flaggedCount = dataset.students.filter((student) => getStudentMetrics(student).riskReasons.length > 0).length;
 
   return (
@@ -31,6 +34,8 @@ export function StudentsPage() {
           <div className="students-filters">
             <label className="search-control"><Search size={16} /><span className="sr-only">Search students</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Find a student" /></label>
             <StudentStatusFilter value={filter} onChange={setFilter} />
+            <StudentRateFilter value={rateFilter} onChange={setRateFilter} />
+            <StudentCoverageFilter value={coverageFilter} onChange={setCoverageFilter} />
             {dataset.sections.length > 1 && <StudentSectionFilter sections={dataset.sections} value={sectionFilter} onChange={setSectionFilter} />}
           </div>
         </div>
