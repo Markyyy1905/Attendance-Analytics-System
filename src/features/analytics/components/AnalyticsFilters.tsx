@@ -13,24 +13,17 @@ export function AnalyticsStudentSearch({ value, onChange }: { value: string; onC
 }
 
 export function AnalyticsFilters({
-  sections,
-  section,
-  onSectionChange,
   dateRange,
   onDateRangeChange,
   student,
   onStudentChange,
 }: {
-  sections: string[];
-  section: string;
-  onSectionChange: (value: string) => void;
   dateRange: string;
   onDateRangeChange: (value: string) => void;
   student: string;
   onStudentChange: (value: string) => void;
 }) {
   return <div className="analytics-filters" aria-label="Analytics filters">
-    <AnalyticsSectionSelect sections={sections} value={section} onChange={onSectionChange} />
     <AnalyticsDateRangeSelect value={dateRange} onChange={onDateRangeChange} />
     <AnalyticsStudentSearch value={student} onChange={onStudentChange} />
   </div>;

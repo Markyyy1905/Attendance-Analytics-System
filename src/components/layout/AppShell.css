@@ -110,3 +110,47 @@
 }
 
 .app-frame .sign-out-button:hover,.app-frame .sign-out-button:focus-visible{color:#ff7b72 !important;border-color:#f85149 !important;box-shadow:0 0 0 1px #f85149;background:rgb(248 81 73 / 10%)}
+
+/* Desktop sidebar collapse */
+.sidebar,
+.app-main,
+.brand-wordmark,
+.workspace-switcher,
+.workspace-copy,
+.nav-link,
+.nav-section-label,
+.sidebar-collapse-toggle { transition: width .24s cubic-bezier(.22,1,.36,1), margin .24s cubic-bezier(.22,1,.36,1), padding .2s ease, opacity .18s ease, transform .24s ease; }
+.app-main { transition-property: width, margin-left; }
+.sidebar-collapse-toggle { display: inline-grid; margin-left: auto; }
+.sidebar-collapse-toggle:hover { color: #79c0ff; }
+.sidebar-collapsed .sidebar { width: 76px; padding-inline: 12px; }
+.sidebar-collapsed .app-main { width: calc(100% - 76px); margin-left: 76px; }
+.sidebar-collapsed .brand-lockup { justify-content: center; padding-inline: 0; }
+.sidebar-collapsed .brand-wordmark,
+.sidebar-collapsed .workspace-copy,
+.sidebar-collapsed .nav-section-label { width: 0; overflow: hidden; opacity: 0; pointer-events: none; }
+.sidebar-collapsed .sidebar-collapse-toggle { margin-left: 0; }
+.sidebar-collapsed .workspace-switcher { justify-content: center; padding-inline: 8px; }
+.sidebar-collapsed .nav-link { justify-content: center; padding-inline: 0; }
+.sidebar-collapsed .nav-link span { display: none; }
+.sidebar-collapsed .sidebar-foot { align-items: center; }
+@media(max-width:760px) {
+  .sidebar-collapse-toggle { display: none; }
+  .sidebar-collapsed .sidebar { width: 268px; padding-inline: 15px; }
+  .sidebar-collapsed .app-main { width: 100%; margin-left: 0; }
+  .sidebar-collapsed .brand-wordmark,
+  .sidebar-collapsed .workspace-copy,
+  .sidebar-collapsed .nav-section-label { width: auto; opacity: 1; overflow: visible; pointer-events: auto; }
+  .sidebar-collapsed .nav-link { justify-content: flex-start; padding-inline: 11px; }
+  .sidebar-collapsed .nav-link span { display: inline; }
+}
+
+.sidebar-collapsed .sidebar-collapse-toggle { display: none; }
+
+.sidebar-collapsed .workspace-switcher { display: none; }
+
+.brand-collapse-trigger { width: 34px; height: 34px; flex: 0 0 34px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 9px; background: transparent; cursor: pointer; }
+.brand-collapse-trigger:hover { background: var(--surface-soft); }
+.brand-collapse-trigger:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.sidebar-collapsed .brand-lockup { width: 100%; padding-inline: 0; justify-content: center; }
+.sidebar-collapsed .brand-collapse-trigger { margin-inline: auto; }

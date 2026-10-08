@@ -7,6 +7,7 @@ import {
   FileSpreadsheet,
   LayoutDashboard,
   Menu,
+  PanelLeftClose,
   UsersRound,
   X,
 } from "lucide-react";
@@ -24,17 +25,21 @@ const workspaceLinks = [
 
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { dataset, classes, activeClassId, selectClass, isLoading, user, signOut } = useAttendanceData();
   const assignedClasses = classes.filter((item) => item.assigned);
 
 
   return (
-    <div className="app-frame">
+    <div className={`app-frame ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
       {menuOpen && <button className="nav-scrim" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
       <aside id="sidebar-navigation" className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
         <div className="brand-lockup" aria-label="TalaTrack">
-          <img className="brand-mark-image" src="/image.png" alt="" aria-hidden="true" />
+          <button className="brand-collapse-trigger" type="button" aria-label={sidebarCollapsed ? "Expand sidebar" : "TalaTrack home"} onClick={() => { if (sidebarCollapsed) setSidebarCollapsed(false); }}>
+            <img className="brand-mark-image" src="/image.png" alt="" aria-hidden="true" />
+          </button>
           <div className="brand-wordmark"><strong>TalaTrack</strong><span>Attendance insights</span></div>
+          <button className="icon-button sidebar-collapse-toggle" type="button" aria-label="Collapse sidebar" onClick={() => setSidebarCollapsed(true)}><PanelLeftClose size={18} /></button>
           <button className="icon-button mobile-close" aria-label="Close navigation" onClick={() => setMenuOpen(false)}><X size={18} /></button>
         </div>
 
