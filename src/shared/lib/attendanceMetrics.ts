@@ -37,9 +37,7 @@ export function getStudentMetrics(student: AttendanceStudent): StudentMetrics {
   const coveredSessions = recorded + excused;
   const attendanceRateExact = recorded ? ((present + late) / recorded) * 100 : null;
   const riskReasons: string[] = [];
-  if (recorded && ((present + late) / recorded) < 0.75) riskReasons.push(`Attendance below 75% (${attendanceRateExact!.toFixed(1)}% across ${recorded} eligible marks)`);
-  if (consecutiveAbsences >= 5) riskReasons.push(`${consecutiveAbsences} consecutive absences in this period`);
-  if (absent > 8) riskReasons.push(`${absent} absences in this period (review threshold: more than 8)`);
+  if (absent >= 3) riskReasons.push(`${absent} absences in this period (review threshold: 3 or more)`);
 
   return {
     present, absent, late, excused, expected: recorded, recorded,

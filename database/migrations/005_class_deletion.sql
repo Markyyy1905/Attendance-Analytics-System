@@ -1,0 +1,3 @@
+BEGIN;
+ALTER TABLE classes ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
+COMMIT;

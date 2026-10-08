@@ -52,21 +52,8 @@ export function buildAnalyticsWorkbook(report: AnalyticsReportInput) {
   const highestSession = trend.length ? Math.max(...trend.map((point) => point.rate)) : null;
   const lowestSession = trend.length ? Math.min(...trend.map((point) => point.rate)) : null;
   const latestRate = trend.length ? trend[trend.length - 1].rate : null;
-  const attendanceStatus = summary.attendanceRate === null
-    ? "No eligible data"
-    : summary.attendanceRate >= 90
-      ? "Strong"
-      : summary.attendanceRate >= 75
-        ? "Monitor"
-        : "Review needed";
-  const attendanceStatusStyle = summary.attendanceRate === null
-    ? "Muted"
-    : summary.attendanceRate >= 90
-      ? "Success"
-      : summary.attendanceRate >= 75
-        ? "Warning"
-        : "Danger";
-
+  const attendanceStatus = summary.atRisk ? "Students need review" : "No active review flags";
+  const attendanceStatusStyle = summary.atRisk ? "Warning" : "Muted";
   const summaryRows = [
     titleRow("TalaTrack attendance analytics report", 2),
     row(["Purpose", "Decision-support summary for attendance review, class monitoring, and follow-up."], "Note"),
@@ -103,7 +90,7 @@ export function buildAnalyticsWorkbook(report: AnalyticsReportInput) {
     row([], "Cell"),
     row(["INTERPRETATION AND USE"], "Section"),
     row(["How to read this report", "Use Summary for the headline result, Session trend for change over time, Weekday analysis for schedule patterns, and Student results for individual review."]),
-    row(["Review rule", "At-risk conditions are independent prompts for human review; they are not diagnoses or automatic outcomes."]),
+    row(["Review rule", "Students with three or more absences in the selected period need review."]),
     row(["Projection note", "Projection is class-level decision support based on historical patterns. It is not a validated individual prediction."]),
   ].join("");
 

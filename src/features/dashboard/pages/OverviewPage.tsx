@@ -75,7 +75,7 @@ export function OverviewPage() {
         <div className="overview-metric"><span><CalendarDays size={15} /> Roster coverage</span><strong>{summary.coveragePercent}<small>%</small></strong><em>Expected student sessions with a mark</em></div>
         <div className="overview-metric"><span><UsersRound size={15} /> Students monitored</span><strong>{summary.students}</strong><em>In the loaded dataset</em></div>
         <div className="overview-metric"><span><CheckCircle2 size={15} /> Present marks</span><strong>{summary.present.toLocaleString()}</strong><em>Across {summary.sessions} recorded dates</em></div>
-        <div className={`overview-metric ${summary.atRisk ? "overview-metric-risk" : ""}`}><span><CircleAlert size={15} /> Needs a check-in</span><strong>{summary.atRisk}</strong><em>Based on the brief’s risk rules</em></div>
+        <div className={`overview-metric ${summary.atRisk ? "overview-metric-risk" : ""}`}><span><CircleAlert size={15} /> Needs a check-in</span><strong>{summary.atRisk}</strong><em>Based on three or more absences</em></div>
       </section>
 
       <div className="overview-grid">
@@ -92,8 +92,8 @@ export function OverviewPage() {
           <div className="panel-heading"><SectionTitle title="Class snapshot" description="A quick read of recorded attendance." /></div>
           <div className="class-rate"><strong>{summary.attendanceRate ?? "—"}{summary.attendanceRate !== null && <span>%</span>}</strong><span>{summary.attendanceRate === null ? "No eligible marks recorded" : "present across eligible class marks"}</span></div>
           {summary.attendanceRate !== null && <div className="class-rate-meter" role="meter" aria-label="Class attendance rate" aria-valuemin={0} aria-valuemax={100} aria-valuenow={summary.attendanceRate}>
-            <div className="class-rate-track"><span style={{ width: `${Math.min(summary.attendanceRate, 100)}%` }} /><i /></div>
-            <div><span>0%</span><strong>75% review threshold</strong><span>100%</span></div>
+            <div className="class-rate-track"><span style={{ width: `${Math.min(summary.attendanceRate, 100)}%` }} /></div>
+            <div><span>0%</span><strong>Review: 3+ absences</strong><span>100%</span></div>
           </div>}
           <div className="class-status-list">
             <div><span><i className="status-dot status-dot-present" />Present</span><strong>{summary.present}</strong></div>
@@ -114,7 +114,7 @@ export function OverviewPage() {
             <tbody>{studentsAtRisk.slice(0, 5).map(({ student, metrics }) => (
               <tr key={student.id}>
                 <td><div className="student-name-cell"><span className="student-avatar">{initials(student.name)}</span><span className="student-name-copy"><strong>{student.name}</strong><span>{student.program} · {student.section}</span></span></div></td>
-                <td className={metrics.attendanceRateExact !== null && metrics.attendanceRateExact < 75 ? "rate-low" : ""}>{metrics.attendanceRate === null ? "—" : `${metrics.attendanceRate}%`}</td>
+                <td className={metrics.absent >= 3 ? "rate-low" : ""}>{metrics.attendanceRate === null ? "—" : `${metrics.attendanceRate}%`}</td>
                 <td>{metrics.present}</td><td>{metrics.absent}</td><td>{metrics.late}</td><td><RiskLabel reasons={metrics.riskReasons} /></td>
                 <td><Link className="table-link" to={`/students/${student.id}`}>Review</Link></td>
               </tr>
@@ -127,7 +127,7 @@ export function OverviewPage() {
 
       <section className="overview-bottom-row">
         <div className="source-note"><span className="source-icon"><FileUp size={16} /></span><div><strong>Current data source</strong><span>{dataset.sourceName} · {dataset.students.length} student records</span></div><Link to="/import"><ArrowDownToLine size={15} /> Add or update attendance</Link></div>
-        <p className="risk-rule-note">Flags are based on attendance below 75%, five consecutive absences, or more than eight absences.</p>
+        <p className="risk-rule-note">Students need review after three or more absences. Excused and unrecorded marks are excluded.</p>
       </section>
     </main>
   );

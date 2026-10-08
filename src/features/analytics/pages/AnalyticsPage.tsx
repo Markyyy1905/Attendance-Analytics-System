@@ -57,11 +57,7 @@ export function AnalyticsPage() {
     { label: "Unrecorded", value: summary.unrecorded, color: "unrecorded" },
   ];
   const expectedMarks = statusMix.reduce((sum, item) => sum + item.value, 0);
-  const reviewTriggers = [
-    { label: "Below 75% attendance", matches: (reason: string) => reason.startsWith("Attendance below 75%") },
-    { label: "5 or more consecutive absences", matches: (reason: string) => reason.includes("consecutive absences") },
-    { label: "More than 8 absences", matches: (reason: string) => reason.includes("review threshold: more than 8") },
-  ].map((trigger) => ({ ...trigger, count: needsReview.filter(({ metrics }) => metrics.riskReasons.some(trigger.matches)).length }));
+  const reviewTriggers = [{ label: "3 or more absences", matches: (reason: string) => reason.includes("review threshold: 3 or more") }].map((trigger) => ({ ...trigger, count: needsReview.filter(({ metrics }) => metrics.riskReasons.some(trigger.matches)).length }));
   const maxTriggerCount = Math.max(...reviewTriggers.map((trigger) => trigger.count), 1);
 
   async function downloadReport() {
@@ -165,9 +161,9 @@ export function AnalyticsPage() {
           <div className="analytics-assumption"><CircleAlert size={15} /><span>Excused and blank marks are not included in the rate denominator.</span></div>
         </section>
         <section className="panel risk-breakdown-panel">
-          <div className="panel-heading"><div><h2>Students needing review</h2><p>Each condition triggers independently; staff review the evidence.</p></div><span className="risk-count">{needsReview.length}</span></div>
-          <div className="risk-rule-list"><div><span>Attendance below</span><strong>75%</strong></div><div><span>Consecutive absences</span><strong>5</strong></div><div><span>Total absences above</span><strong>8</strong></div></div>
-          <div className="trigger-chart" aria-label="Students matching each review trigger">{reviewTriggers.map((trigger) => <div className="trigger-row" key={trigger.label}><span>{trigger.label}</span><div className="trigger-track"><i style={{ width: `${(trigger.count / maxTriggerCount) * 100}%` }} /></div><strong>{trigger.count}</strong></div>)}</div><p className="trigger-chart-note">Trigger counts can overlap when a student meets more than one rule.</p>
+          <div className="panel-heading"><div><h2>Students needing review</h2><p>Three or more absences in the selected period require staff review.</p></div><span className="risk-count">{needsReview.length}</span></div>
+          <div className="risk-rule-list"><div><span>Absences requiring review</span><strong>3 or more</strong></div></div>
+          <div className="trigger-chart" aria-label="Students matching each review trigger">{reviewTriggers.map((trigger) => <div className="trigger-row" key={trigger.label}><span>{trigger.label}</span><div className="trigger-track"><i style={{ width: `${(trigger.count / maxTriggerCount) * 100}%` }} /></div><strong>{trigger.count}</strong></div>)}</div><p className="trigger-chart-note">Excused and unrecorded sessions do not count as absences.</p>
           {needsReview.length ? <div className="risk-review-list">{needsReview.slice(0, 4).map(({ student, metrics }) => <div className="risk-review-row" key={student.id}><div><strong>{student.name}</strong><span>{metrics.riskReasons[0]}</span></div><RiskLabel reasons={metrics.riskReasons} /></div>)}<Link to="/students" className="risk-view-all">View class roster <ArrowRight size={14} /></Link></div> : <div className="risk-empty">No students matching these filters meet the review rules.</div>}
         </section>
       </div>        </div>

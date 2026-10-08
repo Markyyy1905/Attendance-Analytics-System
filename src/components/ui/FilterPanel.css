@@ -1,0 +1,8 @@
+.filter-panel { width:100%; min-width:0; }
+.filter-panel > summary { cursor:pointer; color:var(--ink); padding:10px 12px; border:1px solid var(--line); border-radius:8px; width:fit-content; font-size:.82rem; }
+.filter-panel > summary:focus-visible { outline:2px solid var(--brand); outline-offset:3px; }
+.filter-panel-fields { display:flex; flex-wrap:wrap; align-items:end; gap:12px; padding-top:12px; }
+.filter-panel:not([open]) .filter-panel-fields { display:none; }
+.filter-panel-fields > * { min-width:170px; flex:1; }
+.students-panel, .attendance-table-panel { overflow:visible; }
+@media(max-width:600px) { .filter-panel-fields { flex-direction:column; align-items:stretch; } .filter-panel-fields > * { width:100%; min-width:0; } }

@@ -8,7 +8,7 @@ export function StudentStatusFilter({ value, onChange }: { value: ReviewFilter; 
     visuallyHiddenLabel
     value={value}
     onChange={(next) => onChange(next as ReviewFilter)}
-    options={[{ value: "all", label: "Any review status" }, { value: "needs-review", label: "Needs review" }, { value: "on-track", label: "No active flags" }, { value: "below-threshold", label: "Attendance below 75%" }, { value: "consecutive-absence", label: "5+ consecutive absences" }, { value: "high-absence", label: "More than 8 absences" }]}
+    options={[{ value: "all", label: "Any review status" }, { value: "needs-review", label: "Needs review" }, { value: "on-track", label: "No active flags" }]}
   />;
 }
 

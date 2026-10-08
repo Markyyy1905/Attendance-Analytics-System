@@ -1,3 +1,4 @@
+import { FilterPanel } from "../../../components/ui/FilterPanel";
 import { SelectField } from "../../../components/ui/SelectField";
 import type { CoverageFilter, PeriodFilter, ReviewFilter } from "../../../shared/lib/attendanceFilters";
 
@@ -14,7 +15,7 @@ export function AnalyticsStudentSearch({ value, onChange }: { value: string; onC
 }
 
 export function AnalyticsReviewFilter({ value, onChange }: { value: ReviewFilter; onChange: (value: ReviewFilter) => void }) {
-  return <SelectField label="Review status" value={value} onChange={(next) => onChange(next as ReviewFilter)} options={[{ value: "all", label: "Any review status" }, { value: "needs-review", label: "Needs review" }, { value: "on-track", label: "No active flags" }, { value: "below-threshold", label: "Attendance below 75%" }, { value: "consecutive-absence", label: "5+ consecutive absences" }, { value: "high-absence", label: "More than 8 absences" }]} />;
+  return <SelectField label="Review status" value={value} onChange={(next) => onChange(next as ReviewFilter)} options={[{ value: "all", label: "Any review status" }, { value: "needs-review", label: "Needs review" }, { value: "on-track", label: "No active flags" }]} />;
 }
 
 export function AnalyticsCoverageFilter({ value, onChange }: { value: CoverageFilter; onChange: (value: CoverageFilter) => void }) {
@@ -43,10 +44,10 @@ export function AnalyticsFilters({
   onReset: () => void;
 }) {
   return <div className="analytics-filters" aria-label="Analytics filters">
-    <AnalyticsDateRangeSelect value={dateRange} onChange={onDateRangeChange} />
+    <FilterPanel><AnalyticsDateRangeSelect value={dateRange} onChange={onDateRangeChange} />
     <AnalyticsStudentSearch value={student} onChange={onStudentChange} />
     <AnalyticsReviewFilter value={review} onChange={onReviewChange} />
     <AnalyticsCoverageFilter value={coverage} onChange={onCoverageChange} />
-    <button className="button button-secondary analytics-filter-reset" type="button" onClick={onReset} disabled={dateRange === "all" && !student && review === "all" && coverage === "all"}>Clear filters</button>
+    <button className="button button-secondary analytics-filter-reset" type="button" onClick={onReset} disabled={dateRange === "all" && !student && review === "all" && coverage === "all"}>Clear filters</button></FilterPanel>
   </div>;
 }

@@ -1,3 +1,4 @@
+import { FilterPanel } from "../../../components/ui/FilterPanel";
 import { useMemo, useState } from "react";
 import { FileUp, Search } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -44,11 +45,11 @@ export function AttendancePage() {
       <section className="panel attendance-table-panel">
         <div className="attendance-controls">
           <label className="search-control"><Search size={16} /><span className="sr-only">Search students</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search students" /></label>
-          <AttendancePeriodFilter value={periodFilter} onChange={setPeriodFilter} />
+          <FilterPanel><AttendancePeriodFilter value={periodFilter} onChange={setPeriodFilter} />
           <AttendanceStatusFilter value={statusFilter} onChange={setStatusFilter} />
           <AttendanceCoverageFilter value={coverageFilter} onChange={setCoverageFilter} />
           {dataset.sections.length > 1 && <AttendanceSectionFilter sections={dataset.sections} value={sectionFilter} onChange={setSectionFilter} />}
-          <span className="mark-legend"><span><AttendanceMark status="P" /> Present</span><span><AttendanceMark status="A" /> Absent</span><span><AttendanceMark status="L" /> Late</span></span>
+          </FilterPanel><span className="mark-legend"><span><AttendanceMark status="P" /> Present</span><span><AttendanceMark status="A" /> Absent</span><span><AttendanceMark status="L" /> Late</span></span>
         </div>
         {isLoading ? <div className="empty-state attendance-empty"><strong>Loading attendance</strong><span>Retrieving class sessions and marks.</span></div> : dataError && !dataset.students.length ? <div className="empty-state attendance-empty" role="alert"><strong>Attendance unavailable</strong><span>{dataError}</span></div> : students.length ? <div className="data-table-wrap attendance-matrix-wrap">
           <table className="data-table attendance-matrix">
@@ -57,7 +58,7 @@ export function AttendancePage() {
               return <tr key={student.id}>
                 <td className="student-col"><div className="student-name-cell"><span className="student-avatar">{initials(student.name)}</span><span className="student-name-copy"><strong>{student.name}</strong><span>{student.program}  /  {student.section}</span></span></div></td>
                 {visibleDates.map((date) => <td key={`${student.id}-${date}`} className="mark-cell"><AttendanceMark status={getStatusForDate(student, date)} /></td>)}
-                <td className={metrics.attendanceRate !== null && metrics.attendanceRate < 75 ? "rate-low" : "rate-normal"}>{metrics.attendanceRate === null ? "—" : `${metrics.attendanceRate}%`}</td><td>{metrics.present}</td><td>{metrics.absent}</td><td>{metrics.late}</td><td><RiskLabel reasons={metrics.riskReasons} /></td>
+                <td className={metrics.absent >= 3 ? "rate-low" : "rate-normal"}>{metrics.attendanceRate === null ? "—" : `${metrics.attendanceRate}%`}</td><td>{metrics.present}</td><td>{metrics.absent}</td><td>{metrics.late}</td><td><RiskLabel reasons={metrics.riskReasons} /></td>
               </tr>;
             })}</tbody>
           </table>

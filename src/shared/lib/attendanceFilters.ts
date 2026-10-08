@@ -1,6 +1,6 @@
 import type { StudentMetrics } from "../types/attendance";
 
-export type ReviewFilter = "all" | "needs-review" | "on-track" | "below-threshold" | "consecutive-absence" | "high-absence";
+export type ReviewFilter = "all" | "needs-review" | "on-track";
 export type CoverageFilter = "all" | "complete" | "missing";
 export type RateFilter = "all" | "below-75" | "75-89" | "90-100" | "no-rate";
 export type PeriodFilter = "all" | "last-30-days" | "recent-10" | "recent-5";
@@ -9,9 +9,7 @@ export function matchesReviewFilter(metrics: StudentMetrics, filter: ReviewFilte
   if (filter === "all") return true;
   if (filter === "needs-review") return metrics.riskReasons.length > 0;
   if (filter === "on-track") return metrics.riskReasons.length === 0;
-  if (filter === "below-threshold") return metrics.attendanceRateExact !== null && metrics.attendanceRateExact < 75;
-  if (filter === "consecutive-absence") return metrics.consecutiveAbsences >= 5;
-  return metrics.absent > 8;
+  return false;
 }
 
 export function matchesCoverageFilter(metrics: StudentMetrics, filter: CoverageFilter) {

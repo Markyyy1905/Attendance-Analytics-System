@@ -1,3 +1,4 @@
+import { DeleteClassButton } from "../components/DeleteClassButton";
 import { useMemo, useState } from "react";
 import { ArrowRight, CalendarDays, FileUp, Search, UsersRound } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -20,7 +21,7 @@ function classInitials(subject: string, code: string) {
 }
 
 export function ClassesPage() {
-  const { classes, activeClassId, selectClass, user, isLoading, dataError } = useAttendanceData();
+  const { classes, activeClassId, selectClass, deleteClass, user, isLoading, dataError } = useAttendanceData();
   const [search, setSearch] = useState("");
   const [term, setTerm] = useState("all");
   const [openingClassId, setOpeningClassId] = useState("");
@@ -55,7 +56,7 @@ export function ClassesPage() {
       <td><span className="class-count"><CalendarDays size={14} />{item.session_count}</span></td>
       <td><span className="class-date">{formatDate(item.uploaded_at)}</span><small className="class-source">{item.source_filename}</small></td>
       <td>{item.assigned ? "Assigned" : "Unassigned"}</td>
-      <td><button className="button button-secondary class-open" disabled={openingClassId === item.id || item.id === activeClassId} onClick={() => void openClass(item.id)}>{item.id === activeClassId ? "Active class" : openingClassId === item.id ? "Opening..." : "Open class"}{item.id !== activeClassId && <ArrowRight size={14} />}</button></td>
+      <td><button className="button button-secondary class-open" disabled={openingClassId === item.id || item.id === activeClassId} onClick={() => void openClass(item.id)}>{item.id === activeClassId ? "Active class" : openingClassId === item.id ? "Opening..." : "Open class"}{item.id !== activeClassId && <ArrowRight size={14} />}</button>{canManageStaff && <DeleteClassButton id={item.id} name={`${item.subject} / ${item.section}`} onDelete={deleteClass} />}</td>
     </tr>)}</tbody></table></div>}
     <p className="class-workspace-note">Each imported section has its own roster, attendance history, trend, and review flags. Administrators manage staff accounts and class assignments on the Staff &amp; access page.</p>
   </main>;
