@@ -129,10 +129,9 @@ async function importDatasetBulk(user, dataset) {
 
 async function registerAccount(req,res) {
   sameOrigin(req);
-  const signupKey = digest(`signup:${req.socket.remoteAddress || ""}`);
+  const signupKey = digest(`signup-v2:${req.socket.remoteAddress || ""}`);
   const recent = await pool.query("SELECT attempts,blocked_until FROM auth_login_attempts WHERE key_hash=$1", [signupKey]);
   if (recent.rows[0]?.blocked_until && new Date(recent.rows[0].blocked_until) > new Date()) throw new InputError("Too many workspace registrations. Try again later.", 429);
-  await pool.query("INSERT INTO auth_login_attempts(key_hash,attempts,window_started_at,blocked_until) VALUES($1,1,now(),NULL) ON CONFLICT(key_hash) DO UPDATE SET attempts=CASE WHEN auth_login_attempts.window_started_at<now()-interval '1 hour' THEN 1 ELSE auth_login_attempts.attempts+1 END,window_started_at=CASE WHEN auth_login_attempts.window_started_at<now()-interval '1 hour' THEN now() ELSE auth_login_attempts.window_started_at END,blocked_until=CASE WHEN auth_login_attempts.window_started_at<now()-interval '1 hour' THEN NULL WHEN auth_login_attempts.attempts>=4 THEN now()+interval '1 hour' ELSE NULL END", [signupKey]);
 
   const input = await body(req);
   const name = String(input.name || "").trim();
@@ -145,6 +144,7 @@ async function registerAccount(req,res) {
 
   const matches = await pool.query("SELECT id FROM schools WHERE lower(btrim(name))=lower($1) ORDER BY created_at LIMIT 2", [school]);
   if (matches.rowCount > 1) throw new InputError("More than one workspace has that name. Ask its administrator to create your staff account.");
+  await pool.query("INSERT INTO auth_login_attempts(key_hash,attempts,window_started_at,blocked_until) VALUES($1,1,now(),NULL) ON CONFLICT(key_hash) DO UPDATE SET attempts=CASE WHEN auth_login_attempts.window_started_at<now()-interval '1 hour' THEN 1 ELSE auth_login_attempts.attempts+1 END,window_started_at=CASE WHEN auth_login_attempts.window_started_at<now()-interval '1 hour' THEN now() ELSE auth_login_attempts.window_started_at END,blocked_until=CASE WHEN auth_login_attempts.window_started_at<now()-interval '1 hour' THEN NULL WHEN auth_login_attempts.attempts>=19 THEN now()+interval '1 hour' ELSE NULL END", [signupKey]);
   const existingSchoolId = matches.rows[0]?.id;
   const client = await pool.connect();
   let user;
