@@ -142,10 +142,25 @@ async function registerAccount(req,res) {
     throw new InputError("Enter your name, school, valid email, and a password of at least 12 characters.");
   }
 
-  const matches = await pool.query("SELECT id FROM schools WHERE lower(btrim(name))=lower($1) ORDER BY created_at LIMIT 2", [school]);
-  if (matches.rowCount > 1) throw new InputError("More than one workspace has that name. Ask its administrator to create your staff account.");
+  const matches = await pool.query(`
+    SELECT s.id,
+      EXISTS (
+        SELECT 1 FROM user_roles ur
+        JOIN users u ON u.id=ur.user_id AND u.school_id=s.id AND u.active
+        WHERE ur.school_id=s.id AND ur.scope_type='school'
+          AND ur.role IN ('administrator','technical_administrator')
+          AND (ur.effective_to IS NULL OR ur.effective_to>CURRENT_DATE)
+      ) AS has_admin
+    FROM schools s
+    WHERE lower(btrim(s.name))=lower($1)
+    ORDER BY s.created_at
+  `, [school]);
+  const administratorMatches = matches.rows.filter((match) => match.has_admin);
+  let existingSchoolId;
+  if (administratorMatches.length === 1) existingSchoolId = administratorMatches[0].id;
+  else if (matches.rowCount === 1) existingSchoolId = matches.rows[0].id;
+  else if (matches.rowCount > 1) throw new InputError("More than one workspace has that name and no unique administrator workspace could be identified. Ask your school administrator to create your staff account.");
   await pool.query("INSERT INTO auth_login_attempts(key_hash,attempts,window_started_at,blocked_until) VALUES($1,1,now(),NULL) ON CONFLICT(key_hash) DO UPDATE SET attempts=CASE WHEN auth_login_attempts.window_started_at<now()-interval '1 hour' THEN 1 ELSE auth_login_attempts.attempts+1 END,window_started_at=CASE WHEN auth_login_attempts.window_started_at<now()-interval '1 hour' THEN now() ELSE auth_login_attempts.window_started_at END,blocked_until=CASE WHEN auth_login_attempts.window_started_at<now()-interval '1 hour' THEN NULL WHEN auth_login_attempts.attempts>=19 THEN now()+interval '1 hour' ELSE NULL END", [signupKey]);
-  const existingSchoolId = matches.rows[0]?.id;
   const client = await pool.connect();
   let user;
   try {
@@ -156,7 +171,7 @@ async function registerAccount(req,res) {
     if (existingSchoolId) {
       await client.query("INSERT INTO audit_events(school_id,action,entity_type,entity_id,after_data) VALUES($1,'staff.registration.requested','user',$2,$3::jsonb)", [schoolId, user.id, JSON.stringify({ displayName: name, email })]);
     } else {
-      await client.query("INSERT INTO user_roles(school_id,user_id,role,scope_type) VALUES($1,$2,'faculty','school')", [schoolId, user.id]);
+      await client.query("INSERT INTO user_roles(school_id,user_id,role,scope_type) VALUES($1,$2,'administrator','school')", [schoolId, user.id]);
       await client.query("INSERT INTO audit_events(school_id,actor_id,action,entity_type,entity_id,after_data) VALUES($1,$2,'school.created','school',$1,$3::jsonb)", [schoolId, user.id, JSON.stringify({ creator: user.id })]);
     }
     await client.query("COMMIT");
@@ -170,7 +185,7 @@ async function registerAccount(req,res) {
 
   if (existingSchoolId) return send(res, 202, { pendingApproval: true });
   await createSession(user.id, req, res);
-  return send(res, 201, { user: { ...user, school_name: school, roles: ["faculty"], school_roles: ["faculty"] } });
+  return send(res, 201, { user: { ...user, school_name: school, roles: ["administrator"], school_roles: ["administrator"] } });
 }
 
 export async function handleRequest(req,res){const origin=req.headers.origin;if(origin&&origins.has(origin))res.setHeader("access-control-allow-origin",origin);res.setHeader("vary","Origin");if(req.method==="OPTIONS"){if(!origin||!origins.has(origin))return send(res,403,{error:"Origin is not allowed."});res.writeHead(204,{"access-control-allow-origin":origin,"access-control-allow-methods":"GET,POST,PUT,OPTIONS","access-control-allow-headers":"content-type","access-control-allow-credentials":"true","vary":"Origin"});return res.end();}res.setHeader("access-control-allow-credentials","true");const url=new URL(req.url,`http://${req.headers.host||"localhost"}`);try{

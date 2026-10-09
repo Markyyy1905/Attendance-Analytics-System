@@ -30,7 +30,7 @@ function getFieldErrors(data: FormData, mode: "login" | "register"): FieldErrors
 function getAuthErrorMessage(error: unknown) {
   const message = error instanceof Error ? error.message : "Something went wrong. Please try again.";
   if (/email or password is incorrect/i.test(message)) return "The email or password doesn’t match. Check both and try again.";
-  if (/more than one workspace has that name/i.test(message)) return "We found more than one workspace with that school name. Ask your school administrator to create your staff account.";
+  if (/more than one workspace/i.test(message)) return "We found multiple workspaces with that school name and couldn’t identify one administrator workspace. Ask your school administrator to create your staff account.";
   if (/account already exists/i.test(message)) return "An account already exists for this email in that school. Try signing in or ask your administrator for help.";
   if (/too many workspace registrations/i.test(message)) return "There have been too many registration attempts. Please try again later.";
   if (/too many sign-in attempts/i.test(message)) return "There have been too many sign-in attempts. Please try again later.";
@@ -120,7 +120,7 @@ export function LoginPage() {
           <button className="button button-primary auth-submit" disabled={busy}>{busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}</button>
         </form>
         <p className="auth-switch">{mode === "login" ? "New to TalaTrack?" : "Already have an account?"} <button type="button" onClick={switchMode}>{mode === "login" ? "Create an account" : "Sign in"}</button></p>
-        <p className="auth-footnote">Using the exact name of an existing school sends an account request to its administrator. A new school name creates a workspace, but sign-up accounts do not have Staff &amp; access permissions.</p>
+        <p className="auth-footnote">Using the exact name of an existing school sends an account request to its administrator. Registering a new school workspace makes you its administrator.</p>
       </section>
     </main>
   );

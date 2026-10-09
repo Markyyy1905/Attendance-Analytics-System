@@ -57,7 +57,7 @@ Students are the people represented by the records, not direct users of the init
 
 ### Existing capabilities
 
-- The app has school workspace registration (the registering account receives the faculty role), email/password sign-in and sign-out, PostgreSQL sessions, administrator-provisioned staff accounts, and server-side school/class access checks. Public sign-up accounts cannot access Staff & access. Sign-up with an existing school's exact name creates an inactive staff request that must be approved by that school's administrator before the account can sign in.
+- The app has school workspace registration (the first account receives the administrator role), email/password sign-in and sign-out, PostgreSQL sessions, administrator-provisioned staff accounts, and server-side school/class access checks. Sign-up with an existing school's exact name creates an inactive staff request that must be approved by that school's administrator before the account can sign in; approval activates the account as faculty.
 - PostgreSQL is the only attendance data source; the app starts empty when no records exist.
 - The shared Node API is used by Vite locally and a Vercel function in deployment. CSV section blocks are saved as separate classes.
 - CSV preview reports row errors/warnings before a transaction commits; import jobs and attendance changes are auditable.

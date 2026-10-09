@@ -8,7 +8,7 @@ TalaTrack is a multi-school attendance workspace built with React, TypeScript, N
 2. Install dependencies with `npm ci`.
 3. Apply versioned schema migrations with `npm run db:migrate`. The runner applies pending SQL migrations without printing connection details.
 4. Run `npm run dev`. Vite serves the browser app and routes local `/api` requests to the current PostgreSQL API handler in this checkout; there is no second API terminal to start.
-5. Open the app and create a faculty account. Public registration assigns the faculty role; administrator privileges are managed separately. Use a unique email and a password with at least 12 characters.
+5. Open the app and register a new school workspace. The first account for a new workspace receives the administrator role. A signup using an existing school's exact name becomes a staff request for that school's administrator to approve. Use a unique email and a password with at least 12 characters.
 
 The application never seeds illustrative student records. Administrators can add staff accounts and assign classes; faculty can import the provided attendance CSV template for their workspace. Account sessions are opaque, server-side PostgreSQL records with HTTP-only cookies. Set `APP_ORIGINS` only when an additional cross-origin client is needed. Production requires HTTPS so session cookies use the `Secure` attribute.
 
